@@ -16,7 +16,7 @@ TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'seÃƒÂ±ales de que estas sufriendo burnout y como recuperarte',
+    'seÃƒÆ’Ã‚Â±ales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -27,7 +27,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'seÃƒÂ±ales de alerta de que necesitas ayuda psicologica',
+    'seÃƒÆ’Ã‚Â±ales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -67,13 +67,13 @@ def get_youtube():
 
 def generar_guion(tema):
     client = Groq(api_key=GROQ_API_KEY)
-    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en espaÃƒÂ±ol latino. Crea contenido sobre: {tema}
+    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en espaÃƒÆ’Ã‚Â±ol latino. Crea contenido sobre: {tema}
 
 Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo VIRAL de maximo 70 caracteres, usa numeros o preguntas impactantes",
   "descripcion": "descripcion SEO de 400 palabras. Empieza con pregunta impactante. Usa emojis. Incluye llamada a suscribirse. Termina con 20 hashtags: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness",
-  "guion": "guion narrado en espaÃƒÂ±ol latino de 500 palabras, empatico y conversacional. Gancho impactante en primeras 5 palabras. Sin bullet points.",
+  "guion": "guion narrado en espaÃƒÆ’Ã‚Â±ol latino de 500 palabras, empatico y conversacional. Gancho impactante en primeras 5 palabras. Sin bullet points.",
   "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","SuperacionPersonal","VidaSaludable","MenteClara"],
   "guion_short": "guion de 70 palabras para Short viral. Empieza con dato impactante. Termina con llamada a la accion.",
   "titulo_short": "titulo Short maximo 55 caracteres con 2 emojis"
@@ -145,21 +145,18 @@ def get_music_file():
     return random.choice(archivos) if archivos else None
 
 def mezclar_audio(voz_mp3, musica, salida, vol=0.10):
-    voz_wav = '/tmp/voz_temp.wav'
-    ok_wav = run_ffmpeg(['ffmpeg', '-y', '-i', voz_mp3, '-ar', '44100', '-ac', '2', '-f', 'wav', '-acodec', 'pcm_s16le', voz_wav])
-    if ok_wav and os.path.exists(voz_wav) and os.path.getsize(voz_wav) > 1000:
-        ok = run_ffmpeg([
-            'ffmpeg', '-y', '-i', voz_wav, '-i', musica,
-            '-filter_complex',
-            f'[0:a]volume=1.0[v];[1:a]volume={vol},aloop=loop=-1:size=2e+09[m];[v][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
-            '-map', '[out]', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', salida
-        ])
-        if ok and os.path.exists(salida) and os.path.getsize(salida) > 1000:
-            print('Mezcla OK')
-            return
     import shutil
-    shutil.copy(voz_mp3, salida)
-    print('Mezcla fallida, usando solo voz')
+    ok = run_ffmpeg([
+        'ffmpeg', '-y',
+        '-i', voz_mp3, '-i', musica,
+        '-filter_complex', f'[0:a]aformat=sample_rates=44100:channel_layouts=stereo[a1];[1:a]volume={vol},aformat=sample_rates=44100:channel_layouts=stereo,aloop=loop=-1:size=2e+09[a2];[a1][a2]amix=inputs=2:duration=first[out]',
+        '-map', '[out]', '-c:a', 'aac', '-b:a', '128k', salida
+    ])
+    if not ok or not os.path.exists(salida) or os.path.getsize(salida) < 1000:
+        shutil.copy(voz_mp3, salida)
+        print('Mezcla fallida, usando solo voz')
+    else:
+        print('Mezcla OK')
 
 def crear_thumbnail(titulo, archivo):
     img = Image.new('RGB', (1280, 720), color=(10, 25, 55))
@@ -300,7 +297,7 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('Ã°Å¸Â§Â  <b>SaludMentalReal</b> Ã¢â‚¬â€ Iniciando produccion...')
+    send_telegram('ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â  <b>SaludMentalReal</b> ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
     videos_h = get_video_files('assets/videos_h_small')
     videos_v = get_video_files('assets/videos_v_small')
@@ -338,10 +335,10 @@ def main():
     crear_short(audio_short_mix, srt_short, videos_v, video_short)
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'Ã¢Å“â€¦ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'Ã¢Å“â€¦ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
-    send_telegram(f'Ã°Å¸Å½â€° <b>SaludMentalReal</b> Ã¢â‚¬â€ Completado | Voz: {voz}')
+    send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° <b>SaludMentalReal</b> ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Completado | Voz: {voz}')
 
 if __name__ == '__main__':
     main()
