@@ -14,7 +14,7 @@ TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'seÃ±ales de que estas sufriendo burnout y como recuperarte',
+    'señales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -25,7 +25,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'seÃ±ales de alerta de que necesitas ayuda psicologica',
+    'señales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -59,13 +59,13 @@ def get_youtube():
 
 def generar_guion(tema):
     client = Groq(api_key=GROQ_API_KEY)
-    prompt = f'''Eres un psicÃ³logo divulgador para redes sociales. Crea contenido sobre: {tema}
+    prompt = f'''Eres un psicologo divulgador para redes sociales. Crea contenido sobre: {tema}
 
 Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo llamativo para YouTube de maximo 80 caracteres",
   "descripcion": "descripcion SEO de 300 palabras con hashtags al final",
-  "guion": "guion narrado en espaÃ±ol latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
+  "guion": "guion narrado en español latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
   "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10"],
   "guion_short": "guion corto de 60 palabras para video vertical de 30 segundos, impactante y directo",
   "titulo_short": "titulo del short de maximo 60 caracteres con emoji"
@@ -80,7 +80,7 @@ Responde SOLO con este JSON sin texto adicional:
 
 async def generar_audio(texto, archivo):
     import edge_tts
-    communicate = edge_tts.Communicate(texto, 'es-MX-JorgeNeural')
+    communicate = edge_tts.Communicate(texto, 'es-ES-AlvaroNeural')
     await communicate.save(archivo)
 
 def get_audio_duration(audio_file):
@@ -99,6 +99,23 @@ def get_video_files(carpeta):
     archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if f.lower().endswith(exts)]
     random.shuffle(archivos)
     return archivos
+
+def get_music_file():
+    carpeta = 'assets/music_small'
+    archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if f.lower().endswith('.mp3')]
+    return random.choice(archivos) if archivos else None
+
+def mezclar_audio(voz, musica, salida, volumen_musica=0.12):
+    subprocess.run([
+        'ffmpeg', '-y',
+        '-i', voz,
+        '-i', musica,
+        '-filter_complex',
+        f'[1:a]volume={volumen_musica},aloop=loop=-1:size=2e+09[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
+        '-map', '[out]',
+        '-c:a', 'aac', '-b:a', '192k',
+        salida
+    ], capture_output=True)
 
 def crear_thumbnail(titulo, archivo):
     img = Image.new('RGB', (1280, 720), color=(15, 35, 70))
@@ -210,12 +227,14 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
+    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
     videos_h = get_video_files('assets/videos_h_small')
     videos_v = get_video_files('assets/videos_v_small')
+    musica = get_music_file()
     print(f'Videos horizontales: {len(videos_h)} | Verticales: {len(videos_v)}')
+    print(f'Musica: {musica}')
 
     tema = random.choice(TEMAS)
     print(f'Tema: {tema}')
@@ -228,10 +247,19 @@ def main():
     guion_short = datos['guion_short']
     print(f'Titulo: {titulo}')
 
-    audio_largo = '/tmp/smr/audio_largo.mp3'
-    asyncio.run(generar_audio(guion, audio_largo))
-    audio_short = '/tmp/smr/audio_short.mp3'
-    asyncio.run(generar_audio(guion_short, audio_short))
+    audio_voz = '/tmp/smr/audio_voz.mp3'
+    asyncio.run(generar_audio(guion, audio_voz))
+    audio_voz_short = '/tmp/smr/audio_voz_short.mp3'
+    asyncio.run(generar_audio(guion_short, audio_voz_short))
+
+    if musica:
+        audio_largo = '/tmp/smr/audio_largo.mp3'
+        mezclar_audio(audio_voz, musica, audio_largo)
+        audio_short = '/tmp/smr/audio_short.mp3'
+        mezclar_audio(audio_voz_short, musica, audio_short)
+    else:
+        audio_largo = audio_voz
+        audio_short = audio_voz_short
 
     thumbnail = '/tmp/smr/thumbnail.jpg'
     crear_thumbnail(titulo, thumbnail)
@@ -244,12 +272,12 @@ def main():
 
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'âœ… Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
 
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'âœ… Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
 
-    send_telegram('ðŸŽ‰ <b>SaludMentalReal</b> â€” Produccion completada')
+    send_telegram('🎉 <b>SaludMentalReal</b> — Produccion completada')
 
 if __name__ == '__main__':
     main()
