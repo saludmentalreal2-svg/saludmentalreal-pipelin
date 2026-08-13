@@ -10,13 +10,13 @@ TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
 TELEGRAM_CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
 CHANNEL_NAME = 'SaludMentalReal'
 
-VOCES = ['es-MX-JorgeNeural', 'es-CO-GonzaloNeural', 'es-MX-LibertadNeural']
+VOCES = ['es-MX-JorgeNeural', 'es-CO-GonzaloNeural']
 
 TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'señales de que estas sufriendo burnout y como recuperarte',
+    'seÃ±ales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -27,7 +27,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'señales de alerta de que necesitas ayuda psicologica',
+    'seÃ±ales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -67,13 +67,13 @@ def get_youtube():
 
 def generar_guion(tema):
     client = Groq(api_key=GROQ_API_KEY)
-    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en español latino. Crea contenido sobre: {tema}
+    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en espaÃ±ol latino. Crea contenido sobre: {tema}
 
 Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo VIRAL de maximo 70 caracteres, usa numeros o preguntas impactantes",
   "descripcion": "descripcion SEO de 400 palabras. Empieza con pregunta impactante. Usa emojis. Incluye llamada a suscribirse. Termina con 20 hashtags: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness #CrecimientoPersonal #PsicologiaPositiva #SuperacionPersonal #VidaSaludable #MenteClara",
-  "guion": "guion narrado en español latino de 500 palabras, empatico y conversacional. Gancho impactante en primeras 5 palabras. Sin bullet points.",
+  "guion": "guion narrado en espaÃ±ol latino de 500 palabras, empatico y conversacional. Gancho impactante en primeras 5 palabras. Sin bullet points.",
   "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","SuperacionPersonal","VidaSaludable","MenteClara"],
   "guion_short": "guion de 70 palabras para Short viral. Empieza con dato impactante. Termina con llamada a la accion.",
   "titulo_short": "titulo Short maximo 55 caracteres con 2 emojis"
@@ -300,7 +300,7 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
+    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
     videos_h = get_video_files('assets/videos_h_small')
     videos_v = get_video_files('assets/videos_v_small')
@@ -340,10 +340,10 @@ def main():
     crear_short(audio_short_mix, srt_short, videos_v, video_short)
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'âœ… Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
-    send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado | Voz: {voz}')
+    send_telegram(f'âœ… Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'ðŸŽ‰ <b>SaludMentalReal</b> â€” Completado | Voz: {voz}')
 
 if __name__ == '__main__':
     main()
