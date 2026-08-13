@@ -10,7 +10,7 @@ TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
 TELEGRAM_CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
 CHANNEL_NAME = 'SaludMentalReal'
 
-VOCES = ['es-ES-AlvaroNeural', 'es-MX-JorgeNeural', 'es-ES-XimenaNeural']
+VOCES = ['es-MX-JorgeNeural', 'es-CO-GonzaloNeural', 'es-MX-LibertadNeural']
 
 TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
@@ -55,7 +55,7 @@ def send_telegram(msg):
 def run_ffmpeg(cmd):
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        print(f'FFmpeg error: {result.stderr[-500:]}')
+        print(f'FFmpeg error: {result.stderr[-800:]}')
     return result.returncode == 0
 
 def get_youtube():
@@ -67,29 +67,60 @@ def get_youtube():
 
 def generar_guion(tema):
     client = Groq(api_key=GROQ_API_KEY)
-    prompt = f'''Eres un psicologo divulgador para redes sociales. Crea contenido sobre: {tema}
+    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en español latino. Crea contenido sobre: {tema}
 
 Responde SOLO con este JSON sin texto adicional:
 {{
-  "titulo": "titulo llamativo para YouTube de maximo 80 caracteres",
-  "descripcion": "descripcion SEO de 300 palabras con hashtags al final",
-  "guion": "guion narrado en español latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
-  "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10"],
-  "guion_short": "guion corto de 60 palabras para video vertical de 30 segundos, impactante y directo",
-  "titulo_short": "titulo del short de maximo 60 caracteres con emoji"
+  "titulo": "titulo VIRAL de maximo 70 caracteres, usa numeros o preguntas impactantes, sin clickbait falso",
+  "descripcion": "descripcion SEO completa de 400 palabras. Empieza con una pregunta impactante. Usa emojis relevantes. Incluye: introduccion enganadora, puntos clave del video, llamada a la accion para suscribirse, y al final 20 hashtags virales como #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness",
+  "guion": "guion narrado en español latino de 500 palabras, empatico, directo y conversacional. Empieza con un gancho impactante en las primeras 5 palabras. Sin bullet points. Como si hablaras con un amigo cercano que necesita ayuda.",
+  "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","BienestarMental","SuperacionPersonal","VidaSaludable"],
+  "guion_short": "guion de 70 palabras para Short viral. Empieza con dato impactante o pregunta. Muy directo. Termina con llamada a la accion.",
+  "titulo_short": "titulo Short maximo 55 caracteres con 2 emojis, que genere curiosidad"
 }}'''
     resp = client.chat.completions.create(
         model='llama-3.3-70b-versatile',
         messages=[{'role':'user','content':prompt}],
         response_format={'type':'json_object'},
-        temperature=0.8
+        temperature=0.9
     )
     return json.loads(resp.choices[0].message.content, strict=False)
 
-async def generar_audio(texto, archivo, voz):
+async def generar_audio_con_subs(texto, audio_file, srt_file, voz):
     import edge_tts
     communicate = edge_tts.Communicate(texto, voz)
-    await communicate.save(archivo)
+    words = []
+    audio_data = b''
+    async for chunk in communicate.stream():
+        if chunk['type'] == 'audio':
+            audio_data += chunk['data']
+        elif chunk['type'] == 'WordBoundary':
+            words.append({
+                'word': chunk['text'],
+                'start': chunk['offset'] / 10000000,
+                'end': (chunk['offset'] + chunk['duration']) / 10000000
+            })
+    with open(audio_file, 'wb') as f:
+        f.write(audio_data)
+    if words:
+        escribir_srt(words, srt_file)
+
+def escribir_srt(words, srt_file):
+    def fmt(s):
+        h, m = int(s//3600), int((s%3600)//60)
+        sec, ms = int(s%60), int((s%1)*1000)
+        return f'{h:02d}:{m:02d}:{sec:02d},{ms:03d}'
+    grupos, grupo, idx = [], [], 1
+    for w in words:
+        grupo.append(w)
+        if len(grupo) >= 4:
+            grupos.append(grupo)
+            grupo = []
+    if grupo:
+        grupos.append(grupo)
+    with open(srt_file, 'w', encoding='utf-8') as f:
+        for i, g in enumerate(grupos):
+            f.write(f"{i+1}\n{fmt(g[0]['start'])} --> {fmt(g[-1]['end'])}\n{' '.join(x['word'] for x in g)}\n\n")
 
 def get_audio_duration(audio_file):
     result = subprocess.run(
@@ -112,11 +143,11 @@ def get_music_file():
     archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if f.lower().endswith('.mp3')]
     return random.choice(archivos) if archivos else None
 
-def mezclar_audio(voz, musica, salida, volumen_musica=0.12):
+def mezclar_audio(voz, musica, salida, vol=0.10):
     ok = run_ffmpeg([
         'ffmpeg', '-y', '-i', voz, '-i', musica,
         '-filter_complex',
-        f'[1:a]volume={volumen_musica},aloop=loop=-1:size=2e+09[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
+        f'[1:a]volume={vol},aloop=loop=-1:size=2e+09[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
         '-map', '[out]', '-c:a', 'aac', '-b:a', '192k', salida
     ])
     if not ok:
@@ -124,44 +155,54 @@ def mezclar_audio(voz, musica, salida, volumen_musica=0.12):
         shutil.copy(voz, salida)
 
 def crear_thumbnail(titulo, archivo):
-    img = Image.new('RGB', (1280, 720), color=(15, 35, 70))
+    img = Image.new('RGB', (1280, 720), color=(10, 25, 55))
     draw = ImageDraw.Draw(img)
-    for i in range(0, 1280, 40):
-        draw.line([(i, 0), (i, 720)], fill=(20, 45, 85), width=1)
-    for i in range(0, 720, 40):
-        draw.line([(0, i), (1280, i)], fill=(20, 45, 85), width=1)
-    draw.rectangle([40, 40, 1240, 680], outline=(0, 180, 220), width=3)
+    draw.rectangle([0, 0, 1280, 720], fill=(10, 25, 55))
+    for i in range(0, 1280, 35):
+        draw.line([(i, 0), (i, 720)], fill=(15, 35, 70), width=1)
+    for i in range(0, 720, 35):
+        draw.line([(0, i), (1280, i)], fill=(15, 35, 70), width=1)
+    draw.rectangle([0, 0, 8, 720], fill=(0, 200, 255))
+    draw.rectangle([1272, 0, 1280, 720], fill=(0, 200, 255))
+    draw.rectangle([0, 0, 1280, 8], fill=(0, 200, 255))
+    draw.rectangle([0, 712, 1280, 720], fill=(0, 200, 255))
     try:
-        font_big = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 68)
-        font_small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 36)
+        font_big = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 72)
+        font_med = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 40)
+        font_small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 30)
     except:
         font_big = ImageFont.load_default()
-        font_small = ImageFont.load_default()
+        font_med = font_big
+        font_small = font_big
     palabras = titulo.upper().split()
     lineas, linea = [], ''
     for p in palabras:
-        if len(linea + ' ' + p) < 22:
-            linea = (linea + ' ' + p).strip()
+        test = (linea + ' ' + p).strip()
+        bbox = draw.textbbox((0,0), test, font=font_big)
+        if bbox[2] - bbox[0] < 1150:
+            linea = test
         else:
             if linea: lineas.append(linea)
             linea = p
     if linea: lineas.append(linea)
-    y = 360 - (len(lineas) * 80) // 2
-    for linea in lineas:
-        bbox = draw.textbbox((0, 0), linea, font=font_big)
+    total_h = len(lineas) * 85
+    y = (720 - total_h) // 2 - 30
+    for ln in lineas:
+        bbox = draw.textbbox((0, 0), ln, font=font_big)
         w = bbox[2] - bbox[0]
-        draw.text(((1280 - w) // 2 + 3, y + 3), linea, font=font_big, fill=(0, 0, 0))
-        draw.text(((1280 - w) // 2, y), linea, font=font_big, fill=(0, 220, 255))
+        draw.text(((1280-w)//2+3, y+3), ln, font=font_big, fill=(0,0,0))
+        draw.text(((1280-w)//2, y), ln, font=font_big, fill=(255,255,255))
         y += 85
-    canal = CHANNEL_NAME.upper()
-    bbox2 = draw.textbbox((0, 0), canal, font=font_small)
+    draw.rectangle([0, 650, 1280, 720], fill=(0, 150, 200))
+    canal = f'@SaludMentalReal'
+    bbox2 = draw.textbbox((0,0), canal, font=font_small)
     w2 = bbox2[2] - bbox2[0]
-    draw.text(((1280 - w2) // 2, 620), canal, font=font_small, fill=(0, 180, 220))
-    img.save(archivo)
+    draw.text(((1280-w2)//2, 658), canal, font=font_small, fill=(255,255,255))
+    img.save(archivo, quality=95)
 
-def crear_video_largo(audio_file, videos_horizontal, output_file):
+def crear_video_largo(audio_file, srt_file, videos_horizontal, output_file):
     duracion_total = get_audio_duration(audio_file)
-    print(f'Duracion audio largo: {duracion_total}s')
+    print(f'Duracion audio: {duracion_total}s')
     dur_por_clip = 10
     clips_necesarios = int(duracion_total / dur_por_clip) + 3
     clips = []
@@ -176,46 +217,49 @@ def crear_video_largo(audio_file, videos_horizontal, output_file):
         ])
         if ok and os.path.exists(clip) and os.path.getsize(clip) > 1000:
             clips.append(clip)
-            print(f'Clip {i} OK: {os.path.getsize(clip)} bytes')
-        else:
-            print(f'Clip {i} FALLO')
-
     if not clips:
-        print('ERROR: No se generaron clips')
+        print('ERROR: No clips generados')
         sys.exit(1)
-
     lista = '/tmp/smr_lista.txt'
     with open(lista, 'w') as f:
         for c in clips:
             f.write(f"file '{c}'\n")
-
     video_mudo = '/tmp/smr_video_mudo.mp4'
-    ok = run_ffmpeg(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista,
+    run_ffmpeg(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista,
         '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_mudo])
-    print(f'Video mudo OK: {ok} | Size: {os.path.getsize(video_mudo) if os.path.exists(video_mudo) else 0}')
-
-    ok2 = run_ffmpeg([
-        'ffmpeg', '-y', '-i', video_mudo, '-i', audio_file,
+    srt_escaped = srt_file.replace(':', '\\:')
+    video_subs = '/tmp/smr_subs.mp4'
+    ok_subs = run_ffmpeg([
+        'ffmpeg', '-y', '-i', video_mudo,
+        '-vf', f"subtitles='{srt_file}':force_style='FontName=Arial,FontSize=18,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,Outline=2,Bold=1,Alignment=2,MarginV=35'",
+        '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_subs
+    ])
+    video_base = video_subs if ok_subs and os.path.exists(video_subs) and os.path.getsize(video_subs) > 1000 else video_mudo
+    run_ffmpeg([
+        'ffmpeg', '-y', '-i', video_base, '-i', audio_file,
         '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-shortest', output_file
     ])
-    print(f'Video final OK: {ok2} | Size: {os.path.getsize(output_file) if os.path.exists(output_file) else 0}')
 
-def crear_short(audio_file, videos_vertical, output_file):
+def crear_short(audio_file, srt_file, videos_vertical, output_file):
     duracion = get_audio_duration(audio_file)
-    print(f'Duracion audio short: {duracion}s')
     src = random.choice(videos_vertical)
     video_mudo = '/tmp/smr_short_mudo.mp4'
-    ok = run_ffmpeg([
+    run_ffmpeg([
         'ffmpeg', '-y', '-i', src,
         '-vf', 'scale=608:1080:force_original_aspect_ratio=decrease,pad=608:1080:(ow-iw)/2:(oh-ih)/2,setsar=1',
-        '-t', str(int(duracion) + 3), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '25', '-an', video_mudo
+        '-t', str(int(duracion)+3), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '25', '-an', video_mudo
     ])
-    print(f'Short mudo OK: {ok}')
-    ok2 = run_ffmpeg([
-        'ffmpeg', '-y', '-i', video_mudo, '-i', audio_file,
+    video_subs = '/tmp/smr_short_subs.mp4'
+    ok_subs = run_ffmpeg([
+        'ffmpeg', '-y', '-i', video_mudo,
+        '-vf', f"subtitles='{srt_file}':force_style='FontName=Arial,FontSize=16,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,Outline=2,Bold=1,Alignment=2,MarginV=50'",
+        '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_subs
+    ])
+    video_base = video_subs if ok_subs and os.path.exists(video_subs) and os.path.getsize(video_subs) > 1000 else video_mudo
+    run_ffmpeg([
+        'ffmpeg', '-y', '-i', video_base, '-i', audio_file,
         '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-shortest', output_file
     ])
-    print(f'Short final OK: {ok2}')
 
 def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None, is_short=False):
     if not os.path.exists(video_file):
@@ -251,13 +295,11 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
 def main():
     send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
-
     videos_h = get_video_files('assets/videos_h_small')
     videos_v = get_video_files('assets/videos_v_small')
     musica = get_music_file()
     voz = random.choice(VOCES)
-    print(f'Videos H: {len(videos_h)} | V: {len(videos_v)} | Voz: {voz} | Musica: {musica}')
-
+    print(f'Videos H: {len(videos_h)} | V: {len(videos_v)} | Voz: {voz}')
     tema = random.choice(TEMAS)
     datos = generar_guion(tema)
     titulo = datos['titulo']
@@ -267,14 +309,12 @@ def main():
     titulo_short = datos['titulo_short']
     guion_short = datos['guion_short']
     print(f'Titulo: {titulo} | Voz: {voz}')
-
     audio_voz = '/tmp/smr/audio_voz.mp3'
-    asyncio.run(generar_audio(guion, audio_voz, voz))
-    print(f'Audio voz OK: {os.path.getsize(audio_voz)} bytes')
-
+    srt_largo = '/tmp/smr/subs_largo.srt'
+    asyncio.run(generar_audio_con_subs(guion, audio_voz, srt_largo, voz))
     audio_voz_short = '/tmp/smr/audio_voz_short.mp3'
-    asyncio.run(generar_audio(guion_short, audio_voz_short, voz))
-
+    srt_short = '/tmp/smr/subs_short.srt'
+    asyncio.run(generar_audio_con_subs(guion_short, audio_voz_short, srt_short, voz))
     if musica:
         audio_largo = '/tmp/smr/audio_largo.mp3'
         mezclar_audio(audio_voz, musica, audio_largo)
@@ -283,23 +323,17 @@ def main():
     else:
         audio_largo = audio_voz
         audio_short_mix = audio_voz_short
-
     thumbnail = '/tmp/smr/thumbnail.jpg'
     crear_thumbnail(titulo, thumbnail)
-
     video_largo = '/tmp/smr/video_largo.mp4'
-    crear_video_largo(audio_largo, videos_h, video_largo)
-
+    crear_video_largo(audio_largo, srt_largo, videos_h, video_largo)
     video_short = '/tmp/smr/video_short.mp4'
-    crear_short(audio_short_mix, videos_v, video_short)
-
+    crear_short(audio_short_mix, srt_short, videos_v, video_short)
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
     send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
-
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
     send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
-
     send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado | Voz: {voz}')
 
 if __name__ == '__main__':
