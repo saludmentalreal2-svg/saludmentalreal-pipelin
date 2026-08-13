@@ -1,4 +1,4 @@
-import os, json, pickle, random, asyncio, requests, subprocess, base64
+import os, json, pickle, random, asyncio, requests, subprocess, base64, sys
 from groq import Groq
 from PIL import Image, ImageDraw, ImageFont
 from googleapiclient.discovery import build
@@ -16,7 +16,7 @@ TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'seÃ±ales de que estas sufriendo burnout y como recuperarte',
+    'señales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -27,7 +27,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'seÃ±ales de alerta de que necesitas ayuda psicologica',
+    'señales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -52,6 +52,12 @@ def send_telegram(msg):
     except:
         pass
 
+def run_ffmpeg(cmd):
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f'FFmpeg error: {result.stderr[-500:]}')
+    return result.returncode == 0
+
 def get_youtube():
     token_data = base64.b64decode(os.environ['TOKEN_PICKLE_B64'])
     creds = pickle.loads(token_data)
@@ -67,7 +73,7 @@ Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo llamativo para YouTube de maximo 80 caracteres",
   "descripcion": "descripcion SEO de 300 palabras con hashtags al final",
-  "guion": "guion narrado en espaÃ±ol latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
+  "guion": "guion narrado en español latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
   "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10"],
   "guion_short": "guion corto de 60 palabras para video vertical de 30 segundos, impactante y directo",
   "titulo_short": "titulo del short de maximo 60 caracteres con emoji"
@@ -107,12 +113,15 @@ def get_music_file():
     return random.choice(archivos) if archivos else None
 
 def mezclar_audio(voz, musica, salida, volumen_musica=0.12):
-    subprocess.run([
+    ok = run_ffmpeg([
         'ffmpeg', '-y', '-i', voz, '-i', musica,
         '-filter_complex',
         f'[1:a]volume={volumen_musica},aloop=loop=-1:size=2e+09[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
         '-map', '[out]', '-c:a', 'aac', '-b:a', '192k', salida
-    ], capture_output=True)
+    ])
+    if not ok:
+        import shutil
+        shutil.copy(voz, salida)
 
 def crear_thumbnail(titulo, archivo):
     img = Image.new('RGB', (1280, 720), color=(15, 35, 70))
@@ -152,46 +161,66 @@ def crear_thumbnail(titulo, archivo):
 
 def crear_video_largo(audio_file, videos_horizontal, output_file):
     duracion_total = get_audio_duration(audio_file)
-    dur_por_clip = 12
-    clips_necesarios = int(duracion_total / dur_por_clip) + 2
+    print(f'Duracion audio largo: {duracion_total}s')
+    dur_por_clip = 10
+    clips_necesarios = int(duracion_total / dur_por_clip) + 3
     clips = []
-    pool = videos_horizontal * (clips_necesarios // len(videos_horizontal) + 2)
+    pool = videos_horizontal * (clips_necesarios // max(len(videos_horizontal), 1) + 2)
     for i in range(clips_necesarios):
         src = pool[i % len(pool)]
         clip = f'/tmp/smr_clip_{i}.mp4'
-        subprocess.run([
+        ok = run_ffmpeg([
             'ffmpeg', '-y', '-i', src,
-            '-vf', 'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2',
+            '-vf', 'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1',
             '-t', str(dur_por_clip), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '25', '-an', clip
-        ], capture_output=True)
-        clips.append(clip)
+        ])
+        if ok and os.path.exists(clip) and os.path.getsize(clip) > 1000:
+            clips.append(clip)
+            print(f'Clip {i} OK: {os.path.getsize(clip)} bytes')
+        else:
+            print(f'Clip {i} FALLO')
+
+    if not clips:
+        print('ERROR: No se generaron clips')
+        sys.exit(1)
+
     lista = '/tmp/smr_lista.txt'
     with open(lista, 'w') as f:
         for c in clips:
             f.write(f"file '{c}'\n")
+
     video_mudo = '/tmp/smr_video_mudo.mp4'
-    subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista,
-        '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_mudo], capture_output=True)
-    subprocess.run([
+    ok = run_ffmpeg(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista,
+        '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_mudo])
+    print(f'Video mudo OK: {ok} | Size: {os.path.getsize(video_mudo) if os.path.exists(video_mudo) else 0}')
+
+    ok2 = run_ffmpeg([
         'ffmpeg', '-y', '-i', video_mudo, '-i', audio_file,
         '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-shortest', output_file
-    ], capture_output=True)
+    ])
+    print(f'Video final OK: {ok2} | Size: {os.path.getsize(output_file) if os.path.exists(output_file) else 0}')
 
 def crear_short(audio_file, videos_vertical, output_file):
     duracion = get_audio_duration(audio_file)
+    print(f'Duracion audio short: {duracion}s')
     src = random.choice(videos_vertical)
     video_mudo = '/tmp/smr_short_mudo.mp4'
-    subprocess.run([
+    ok = run_ffmpeg([
         'ffmpeg', '-y', '-i', src,
-        '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
-        '-t', str(duracion + 2), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '25', '-an', video_mudo
-    ], capture_output=True)
-    subprocess.run([
+        '-vf', 'scale=608:1080:force_original_aspect_ratio=decrease,pad=608:1080:(ow-iw)/2:(oh-ih)/2,setsar=1',
+        '-t', str(int(duracion) + 3), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '25', '-an', video_mudo
+    ])
+    print(f'Short mudo OK: {ok}')
+    ok2 = run_ffmpeg([
         'ffmpeg', '-y', '-i', video_mudo, '-i', audio_file,
         '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-shortest', output_file
-    ], capture_output=True)
+    ])
+    print(f'Short final OK: {ok2}')
 
 def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None, is_short=False):
+    if not os.path.exists(video_file):
+        print(f'ERROR: {video_file} no existe')
+        sys.exit(1)
     if is_short and '#Shorts' not in titulo:
         titulo = titulo + ' #Shorts'
     body = {
@@ -220,14 +249,14 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
+    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
     videos_h = get_video_files('assets/videos_h_small')
     videos_v = get_video_files('assets/videos_v_small')
     musica = get_music_file()
     voz = random.choice(VOCES)
-    print(f'Videos H: {len(videos_h)} | V: {len(videos_v)} | Voz: {voz}')
+    print(f'Videos H: {len(videos_h)} | V: {len(videos_v)} | Voz: {voz} | Musica: {musica}')
 
     tema = random.choice(TEMAS)
     datos = generar_guion(tema)
@@ -241,6 +270,8 @@ def main():
 
     audio_voz = '/tmp/smr/audio_voz.mp3'
     asyncio.run(generar_audio(guion, audio_voz, voz))
+    print(f'Audio voz OK: {os.path.getsize(audio_voz)} bytes')
+
     audio_voz_short = '/tmp/smr/audio_voz_short.mp3'
     asyncio.run(generar_audio(guion_short, audio_voz_short, voz))
 
@@ -264,12 +295,12 @@ def main():
 
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'âœ… Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
 
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'âœ… Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
 
-    send_telegram(f'ðŸŽ‰ <b>SaludMentalReal</b> â€” Completado | Voz: {voz}')
+    send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado | Voz: {voz}')
 
 if __name__ == '__main__':
     main()
