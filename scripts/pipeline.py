@@ -16,7 +16,7 @@ TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'señales de que estas sufriendo burnout y como recuperarte',
+    'seÃ±ales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -27,7 +27,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'señales de alerta de que necesitas ayuda psicologica',
+    'seÃ±ales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -67,13 +67,13 @@ def get_youtube():
 
 def generar_guion(tema):
     client = Groq(api_key=GROQ_API_KEY)
-    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en español latino. Crea contenido sobre: {tema}
+    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en espaÃ±ol latino. Crea contenido sobre: {tema}
 
 Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo VIRAL de maximo 70 caracteres, usa numeros o preguntas impactantes, sin clickbait falso",
   "descripcion": "descripcion SEO completa de 400 palabras. Empieza con una pregunta impactante. Usa emojis relevantes. Incluye: introduccion enganadora, puntos clave del video, llamada a la accion para suscribirse, y al final 20 hashtags virales como #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness",
-  "guion": "guion narrado en español latino de 500 palabras, empatico, directo y conversacional. Empieza con un gancho impactante en las primeras 5 palabras. Sin bullet points. Como si hablaras con un amigo cercano que necesita ayuda.",
+  "guion": "guion narrado en espaÃ±ol latino de 500 palabras, empatico, directo y conversacional. Empieza con un gancho impactante en las primeras 5 palabras. Sin bullet points. Como si hablaras con un amigo cercano que necesita ayuda.",
   "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","BienestarMental","SuperacionPersonal","VidaSaludable"],
   "guion_short": "guion de 70 palabras para Short viral. Empieza con dato impactante o pregunta. Muy directo. Termina con llamada a la accion.",
   "titulo_short": "titulo Short maximo 55 caracteres con 2 emojis, que genere curiosidad"
@@ -148,7 +148,7 @@ def mezclar_audio(voz, musica, salida, vol=0.10):
         'ffmpeg', '-y', '-i', voz, '-i', musica,
         '-filter_complex',
         f'[1:a]volume={vol},aloop=loop=-1:size=2e+09[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
-        '-map', '[out]', '-c:a', 'aac', '-b:a', '192k', salida
+        '-map', '[out]', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', salida
     ])
     if not ok:
         import shutil
@@ -293,7 +293,7 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
+    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
     videos_h = get_video_files('assets/videos_h_small')
     videos_v = get_video_files('assets/videos_v_small')
@@ -310,11 +310,11 @@ def main():
     guion_short = datos['guion_short']
     print(f'Titulo: {titulo} | Voz: {voz}')
     audio_voz = '/tmp/smr/audio_voz.mp3'
-    srt_largo = '/tmp/smr/subs_largo.srt'
-    asyncio.run(generar_audio_con_subs(guion, audio_voz, srt_largo, voz))
+    srt_largo = '/tmp/subs_largo.srt'
+    asyncio.run(generar_audio_con_subs(guion, audio_voz, '/tmp/subs_largo.srt', voz))
     audio_voz_short = '/tmp/smr/audio_voz_short.mp3'
-    srt_short = '/tmp/smr/subs_short.srt'
-    asyncio.run(generar_audio_con_subs(guion_short, audio_voz_short, srt_short, voz))
+    srt_short = '/tmp/subs_short.srt'
+    asyncio.run(generar_audio_con_subs(guion_short, audio_voz_short, '/tmp/subs_short.srt', voz))
     if musica:
         audio_largo = '/tmp/smr/audio_largo.mp3'
         mezclar_audio(audio_voz, musica, audio_largo)
@@ -331,10 +331,10 @@ def main():
     crear_short(audio_short_mix, srt_short, videos_v, video_short)
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'âœ… Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
-    send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado | Voz: {voz}')
+    send_telegram(f'âœ… Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'ðŸŽ‰ <b>SaludMentalReal</b> â€” Completado | Voz: {voz}')
 
 if __name__ == '__main__':
     main()
