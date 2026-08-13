@@ -16,7 +16,7 @@ TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'seÃ±ales de que estas sufriendo burnout y como recuperarte',
+    'señales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -27,7 +27,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'seÃ±ales de alerta de que necesitas ayuda psicologica',
+    'señales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -55,7 +55,7 @@ def send_telegram(msg):
 def run_ffmpeg(cmd):
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        print(f'FFmpeg error: {result.stderr[-500:]}')
+        print(f'FFmpeg error: {result.stderr[-400:]}')
     return result.returncode == 0
 
 def get_youtube():
@@ -67,13 +67,13 @@ def get_youtube():
 
 def generar_guion(tema):
     client = Groq(api_key=GROQ_API_KEY)
-    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en espaÃ±ol latino. Crea contenido sobre: {tema}
+    prompt = f'''Eres un experto en contenido viral de salud mental para YouTube en español latino. Crea contenido sobre: {tema}
 
 Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo VIRAL de maximo 70 caracteres, usa numeros o preguntas impactantes",
-  "descripcion": "descripcion SEO de 400 palabras. Empieza con pregunta impactante. Usa emojis. Incluye llamada a suscribirse. Termina con 20 hashtags: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness #CrecimientoPersonal #PsicologiaPositiva #SuperacionPersonal #VidaSaludable #MenteClara",
-  "guion": "guion narrado en espaÃ±ol latino de 500 palabras, empatico y conversacional. Gancho impactante en primeras 5 palabras. Sin bullet points.",
+  "descripcion": "descripcion SEO de 400 palabras. Empieza con pregunta impactante. Usa emojis. Incluye llamada a suscribirse. Termina con 20 hashtags: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness",
+  "guion": "guion narrado en español latino de 500 palabras, empatico y conversacional. Gancho impactante en primeras 5 palabras. Sin bullet points.",
   "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","SuperacionPersonal","VidaSaludable","MenteClara"],
   "guion_short": "guion de 70 palabras para Short viral. Empieza con dato impactante. Termina con llamada a la accion.",
   "titulo_short": "titulo Short maximo 55 caracteres con 2 emojis"
@@ -86,42 +86,42 @@ Responde SOLO con este JSON sin texto adicional:
     )
     return json.loads(resp.choices[0].message.content, strict=False)
 
-async def generar_audio(texto, archivo, voz):
-    import edge_tts
-    communicate = edge_tts.Communicate(texto, voz)
-    await communicate.save(archivo)
-
-async def generar_srt(texto, srt_file, voz):
+async def tts_con_srt(texto, audio_file, srt_file, voz):
     import edge_tts
     communicate = edge_tts.Communicate(texto, voz)
     words = []
+    audio_data = b''
     async for chunk in communicate.stream():
-        if chunk['type'] == 'WordBoundary':
+        if chunk['type'] == 'audio':
+            audio_data += chunk['data']
+        elif chunk['type'] == 'WordBoundary':
             words.append({
                 'word': chunk['text'],
                 'start': chunk['offset'] / 10000000,
                 'end': (chunk['offset'] + chunk['duration']) / 10000000
             })
-    if not words:
-        print('SRT: no words generated')
-        return False
-    def fmt(s):
-        h, m = int(s//3600), int((s%3600)//60)
-        sec, ms = int(s%60), int((s%1)*1000)
-        return f'{h:02d}:{m:02d}:{sec:02d},{ms:03d}'
-    grupos, grupo = [], []
-    for w in words:
-        grupo.append(w)
-        if len(grupo) >= 4:
+    with open(audio_file, 'wb') as f:
+        f.write(audio_data)
+    print(f'Audio OK: {len(audio_data)} bytes | Words: {len(words)}')
+    if words:
+        def fmt(s):
+            h, m = int(s//3600), int((s%3600)//60)
+            sec, ms = int(s%60), int((s%1)*1000)
+            return f'{h:02d}:{m:02d}:{sec:02d},{ms:03d}'
+        grupos, grupo = [], []
+        for w in words:
+            grupo.append(w)
+            if len(grupo) >= 4:
+                grupos.append(grupo)
+                grupo = []
+        if grupo:
             grupos.append(grupo)
-            grupo = []
-    if grupo:
-        grupos.append(grupo)
-    with open(srt_file, 'w', encoding='utf-8') as f:
-        for i, g in enumerate(grupos):
-            f.write(f"{i+1}\n{fmt(g[0]['start'])} --> {fmt(g[-1]['end'])}\n{' '.join(x['word'] for x in g)}\n\n")
-    print(f'SRT generado: {len(grupos)} grupos en {srt_file}')
-    return True
+        with open(srt_file, 'w', encoding='utf-8') as f:
+            for i, g in enumerate(grupos):
+                f.write(f"{i+1}\n{fmt(g[0]['start'])} --> {fmt(g[-1]['end'])}\n{' '.join(x['word'] for x in g)}\n\n")
+        print(f'SRT OK: {len(grupos)} grupos en {srt_file}')
+        return True
+    return False
 
 def get_audio_duration(audio_file):
     result = subprocess.run(
@@ -146,17 +146,20 @@ def get_music_file():
 
 def mezclar_audio(voz_mp3, musica, salida, vol=0.10):
     voz_wav = '/tmp/voz_temp.wav'
-    run_ffmpeg(['ffmpeg', '-y', '-i', voz_mp3, '-ar', '44100', '-ac', '2', '-f', 'wav', voz_wav])
-    ok = run_ffmpeg([
-        'ffmpeg', '-y', '-i', voz_wav, '-i', musica,
-        '-filter_complex',
-        f'[1:a]volume={vol},aloop=loop=-1:size=2e+09[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
-        '-map', '[out]', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', salida
-    ])
-    if not ok:
-        import shutil
-        shutil.copy(voz_mp3, salida)
-        print('Mezcla fallida, usando solo voz')
+    ok_wav = run_ffmpeg(['ffmpeg', '-y', '-i', voz_mp3, '-ar', '44100', '-ac', '2', '-f', 'wav', voz_wav])
+    if ok_wav and os.path.exists(voz_wav) and os.path.getsize(voz_wav) > 1000:
+        ok = run_ffmpeg([
+            'ffmpeg', '-y', '-i', voz_wav, '-i', musica,
+            '-filter_complex',
+            f'[0:a]volume=1.0[v];[1:a]volume={vol},aloop=loop=-1:size=2e+09[m];[v][m]amix=inputs=2:duration=first:dropout_transition=2[out]',
+            '-map', '[out]', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', salida
+        ])
+        if ok and os.path.exists(salida) and os.path.getsize(salida) > 1000:
+            print('Mezcla OK')
+            return
+    import shutil
+    shutil.copy(voz_mp3, salida)
+    print('Mezcla fallida, usando solo voz')
 
 def crear_thumbnail(titulo, archivo):
     img = Image.new('RGB', (1280, 720), color=(10, 25, 55))
@@ -202,11 +205,10 @@ def crear_thumbnail(titulo, archivo):
     img.save(archivo, quality=95)
 
 def agregar_subtitulos(video_in, srt_file, video_out, fontsize=18, margenv=35):
-    if not os.path.exists(srt_file):
-        print(f'SRT no encontrado: {srt_file}')
+    if not srt_file or not os.path.exists(srt_file):
         return False
     style = f"FontName=Arial,FontSize={fontsize},PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,Outline=2,Bold=1,Alignment=2,MarginV={margenv}"
-    srt_escaped = srt_file.replace('\\', '/').replace(':', '\\:')
+    srt_escaped = srt_file.replace('\\', '/')
     ok = run_ffmpeg([
         'ffmpeg', '-y', '-i', video_in,
         '-vf', f"subtitles='{srt_escaped}':force_style='{style}'",
@@ -232,7 +234,6 @@ def crear_video_largo(audio_file, srt_file, videos_horizontal, output_file):
         if ok and os.path.exists(clip) and os.path.getsize(clip) > 1000:
             clips.append(clip)
     if not clips:
-        print('ERROR: No clips')
         sys.exit(1)
     lista = '/tmp/smr_lista.txt'
     with open(lista, 'w') as f:
@@ -242,9 +243,9 @@ def crear_video_largo(audio_file, srt_file, videos_horizontal, output_file):
     run_ffmpeg(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', lista,
         '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_mudo])
     video_subs = '/tmp/smr_subs.mp4'
-    ok_subs = agregar_subtitulos(video_mudo, srt_file, video_subs, fontsize=18, margenv=35)
+    ok_subs = agregar_subtitulos(video_mudo, srt_file, video_subs)
     video_base = video_subs if ok_subs else video_mudo
-    print(f'Usando video: {"con subs" if ok_subs else "sin subs"}')
+    print(f'Video: {"con subs" if ok_subs else "sin subs"}')
     run_ffmpeg([
         'ffmpeg', '-y', '-i', video_base, '-i', audio_file,
         '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-shortest', output_file
@@ -262,7 +263,7 @@ def crear_short(audio_file, srt_file, videos_vertical, output_file):
     video_subs = '/tmp/smr_short_subs.mp4'
     ok_subs = agregar_subtitulos(video_mudo, srt_file, video_subs, fontsize=16, margenv=50)
     video_base = video_subs if ok_subs else video_mudo
-    print(f'Short usando: {"con subs" if ok_subs else "sin subs"}')
+    print(f'Short: {"con subs" if ok_subs else "sin subs"}')
     run_ffmpeg([
         'ffmpeg', '-y', '-i', video_base, '-i', audio_file,
         '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-shortest', output_file
@@ -270,7 +271,6 @@ def crear_short(audio_file, srt_file, videos_vertical, output_file):
 
 def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None, is_short=False):
     if not os.path.exists(video_file):
-        print(f'ERROR: {video_file} no existe')
         sys.exit(1)
     if is_short and '#Shorts' not in titulo:
         titulo = titulo + ' #Shorts'
@@ -300,7 +300,7 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
+    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
     videos_h = get_video_files('assets/videos_h_small')
     videos_v = get_video_files('assets/videos_v_small')
@@ -317,13 +317,11 @@ def main():
     guion_short = datos['guion_short']
     print(f'Titulo: {titulo} | Voz: {voz}')
     audio_voz = '/tmp/smr/audio_voz.mp3'
-    asyncio.run(generar_audio(guion, audio_voz, voz))
     srt_largo = '/tmp/subs_largo.srt'
-    asyncio.run(generar_srt(guion, srt_largo, voz))
+    asyncio.run(tts_con_srt(guion, audio_voz, srt_largo, voz))
     audio_voz_short = '/tmp/smr/audio_voz_short.mp3'
-    asyncio.run(generar_audio(guion_short, audio_voz_short, voz))
     srt_short = '/tmp/subs_short.srt'
-    asyncio.run(generar_srt(guion_short, srt_short, voz))
+    asyncio.run(tts_con_srt(guion_short, audio_voz_short, srt_short, voz))
     if musica:
         audio_largo = '/tmp/smr/audio_largo.mp3'
         mezclar_audio(audio_voz, musica, audio_largo)
@@ -340,10 +338,10 @@ def main():
     crear_short(audio_short_mix, srt_short, videos_v, video_short)
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'âœ… Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'âœ… Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
-    send_telegram(f'ðŸŽ‰ <b>SaludMentalReal</b> â€” Completado | Voz: {voz}')
+    send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado | Voz: {voz}')
 
 if __name__ == '__main__':
     main()
