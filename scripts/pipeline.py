@@ -14,7 +14,7 @@ TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'señales de que estas sufriendo burnout y como recuperarte',
+    'seÃ±ales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -25,7 +25,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'señales de alerta de que necesitas ayuda psicologica',
+    'seÃ±ales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -59,13 +59,13 @@ def get_youtube():
 
 def generar_guion(tema):
     client = Groq(api_key=GROQ_API_KEY)
-    prompt = f'''Eres un psicólogo divulgador para redes sociales. Crea contenido sobre: {tema}
+    prompt = f'''Eres un psicÃ³logo divulgador para redes sociales. Crea contenido sobre: {tema}
 
 Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo llamativo para YouTube de maximo 80 caracteres",
   "descripcion": "descripcion SEO de 300 palabras con hashtags al final",
-  "guion": "guion narrado en español latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
+  "guion": "guion narrado en espaÃ±ol latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
   "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10"],
   "guion_short": "guion corto de 60 palabras para video vertical de 30 segundos, impactante y directo",
   "titulo_short": "titulo del short de maximo 60 caracteres con emoji"
@@ -210,11 +210,11 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
+    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
-    videos_h = get_video_files('assets/videos_horizontal')
-    videos_v = get_video_files('assets/videos_vertical')
+    videos_h = get_video_files('assets/videos_h_small')
+    videos_v = get_video_files('assets/videos_v_small')
     print(f'Videos horizontales: {len(videos_h)} | Verticales: {len(videos_v)}')
 
     tema = random.choice(TEMAS)
@@ -244,12 +244,12 @@ def main():
 
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'âœ… Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
 
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'âœ… Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
 
-    send_telegram('🎉 <b>SaludMentalReal</b> — Produccion completada')
+    send_telegram('ðŸŽ‰ <b>SaludMentalReal</b> â€” Produccion completada')
 
 if __name__ == '__main__':
     main()
