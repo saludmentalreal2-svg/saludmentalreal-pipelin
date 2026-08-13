@@ -20,7 +20,7 @@ TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'señales de que estas sufriendo burnout y como recuperarte',
+    'seÃƒÂ±ales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -31,7 +31,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'señales de alerta de que necesitas ayuda psicologica',
+    'seÃƒÂ±ales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -71,7 +71,7 @@ Responde SOLO con este JSON sin texto adicional:
 {{
   "titulo": "titulo llamativo para YouTube de maximo 80 caracteres",
   "descripcion": "descripcion SEO de 300 palabras con hashtags al final",
-  "guion": "guion narrado en español latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
+  "guion": "guion narrado en espaÃƒÂ±ol latino de 400 palabras, empatico y directo, sin bullet points, como si hablaras con un amigo",
   "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10"],
   "guion_short": "guion corto de 60 palabras para video vertical de 30 segundos, impactante y directo",
   "titulo_short": "titulo del short de maximo 60 caracteres con emoji"
@@ -190,6 +190,9 @@ def crear_thumbnail(titulo, archivo):
     img.save(archivo)
 
 def crear_video_largo(audio_file, srt_file, videos_horizontal, output_file):
+    import shutil
+    shutil.copy(srt_file, '/tmp/smr_subs_largo.srt')
+    srt_file = '/tmp/smr_subs_largo.srt'
     duracion_total = get_audio_duration(audio_file)
     dur_por_clip = 12
     clips_necesarios = int(duracion_total / dur_por_clip) + 2
@@ -214,7 +217,7 @@ def crear_video_largo(audio_file, srt_file, videos_horizontal, output_file):
     video_con_subs = '/tmp/smr_video_subs.mp4'
     subprocess.run([
         'ffmpeg', '-y', '-i', video_mudo, '-vf',
-        f"subtitles={srt_file}:force_style='FontName=Arial,FontSize=22,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Bold=1,Alignment=2,MarginV=40'",
+        f"subtitles=/tmp/smr/subs.srt:force_style='FontName=Arial,FontSize=22,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Bold=1,Alignment=2,MarginV=40'",
         '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_con_subs
     ], capture_output=True)
     subprocess.run([
@@ -223,6 +226,9 @@ def crear_video_largo(audio_file, srt_file, videos_horizontal, output_file):
     ], capture_output=True)
 
 def crear_short(audio_file, srt_file, videos_vertical, output_file):
+    import shutil
+    shutil.copy(srt_file, '/tmp/smr_subs_short.srt')
+    srt_file = '/tmp/smr_subs_short.srt'
     duracion = get_audio_duration(audio_file)
     src = random.choice(videos_vertical)
     video_mudo = '/tmp/smr_short_mudo.mp4'
@@ -234,7 +240,7 @@ def crear_short(audio_file, srt_file, videos_vertical, output_file):
     video_con_subs = '/tmp/smr_short_subs.mp4'
     subprocess.run([
         'ffmpeg', '-y', '-i', video_mudo, '-vf',
-        f"subtitles={srt_file}:force_style='FontName=Arial,FontSize=20,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Bold=1,Alignment=2,MarginV=60'",
+        f"subtitles=/tmp/smr/subs.srt:force_style='FontName=Arial,FontSize=20,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Bold=1,Alignment=2,MarginV=60'",
         '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video_con_subs
     ], capture_output=True)
     subprocess.run([
@@ -271,7 +277,7 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
     return video_id
 
 def main():
-    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
+    send_telegram('Ã°Å¸Â§Â  <b>SaludMentalReal</b> Ã¢â‚¬â€ Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
     videos_h = get_video_files('assets/videos_h_small')
@@ -318,12 +324,12 @@ def main():
 
     youtube = get_youtube()
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
-    send_telegram(f'✅ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'Ã¢Å“â€¦ Video largo subido\n<b>{titulo}</b>\nhttps://youtu.be/{vid_id}')
 
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
-    send_telegram(f'✅ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
+    send_telegram(f'Ã¢Å“â€¦ Short subido\n<b>{titulo_short}</b>\nhttps://youtu.be/{short_id}')
 
-    send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado | Voz: {voz}')
+    send_telegram(f'Ã°Å¸Å½â€° <b>SaludMentalReal</b> Ã¢â‚¬â€ Completado | Voz: {voz}')
 
 if __name__ == '__main__':
     main()
