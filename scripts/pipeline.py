@@ -11,12 +11,15 @@ TELEGRAM_CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
 CHANNEL_NAME = 'SaludMentalReal'
 CHANNEL_HANDLE = '@SaludMentalReal1'
 VOZ = 'es-MX-JorgeNeural'
+VOZ_RATE = '-8%'
+VOZ_PITCH = '-3Hz'
+VOZ_VOLUME = '+10%'
 
 TEMAS = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres inmediatamente',
     'como dormir mejor cuando la mente no para',
-    'señales de que estas sufriendo burnout y como recuperarte',
+    'seÃƒÆ’Ã‚Â±ales de que estas sufriendo burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie te explica',
     'como salir de una adiccion cuando sientes que no puedes',
@@ -27,7 +30,7 @@ TEMAS = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'señales de alerta de que necesitas ayuda psicologica',
+    'seÃƒÆ’Ã‚Â±ales de alerta de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos al dia',
     'como dejar de procrastinar cuando la ansiedad te paraliza',
     'el sindrome del impostor que es y como combatirlo',
@@ -45,7 +48,7 @@ TEMAS = [
     'como decirle no a las personas toxicas en tu vida',
     'por que te sientes vacio sin razon aparente',
     'como dejar de buscar aprobacion de los demas',
-    'señales de que eres emocionalmente inmaduro',
+    'seÃƒÆ’Ã‚Â±ales de que eres emocionalmente inmaduro',
     'como sanar relaciones toxicas sin drama',
     'el miedo al rechazo de donde viene y como vencerlo',
     'por que saboteas tu propio exito inconscientemente',
@@ -56,15 +59,15 @@ TEMAS = [
     'que es la ansiedad generalizada y como tratarla',
     'por que lloras sin razon y que significa',
     'como dejar de compararte con los demas en redes sociales',
-    'señales de que tienes trauma emocional sin saberlo',
+    'seÃƒÆ’Ã‚Â±ales de que tienes trauma emocional sin saberlo',
     'como manejar la soledad cuando vives solo',
-    'por que sientes que no encajas en ningún lado',
+    'por que sientes que no encajas en ningÃƒÆ’Ã‚Âºn lado',
     'como recuperar la motivacion cuando todo te da igual',
     'el agotamiento emocional que nadie ve pero todos sienten',
     'como dejar de ser tan duro contigo mismo',
     'por que te cuesta trabajo ser feliz aunque tengas todo',
     'como superar el miedo al fracaso paso a paso',
-    'señales de que necesitas terapia urgentemente',
+    'seÃƒÆ’Ã‚Â±ales de que necesitas terapia urgentemente',
     'como manejar una relacion con alguien deprimido',
     'por que la ansiedad aparece de noche y como calmarla',
     'como hablar de salud mental sin que te juzguen',
@@ -72,7 +75,7 @@ TEMAS = [
     'como salir del ciclo de la negatividad mental',
     'por que tienes miedo al exito y no solo al fracaso',
     'como construir autoestima desde cero cuando esta destruida',
-    'señales de que una relacion te esta dañando la salud mental',
+    'seÃƒÆ’Ã‚Â±ales de que una relacion te esta daÃƒÆ’Ã‚Â±ando la salud mental',
     'como manejar los celos sin destruir tu relacion',
     'por que te sientes culpable de ser feliz',
     'como superar la traicion de alguien que amabas',
@@ -80,7 +83,7 @@ TEMAS = [
     'como dejar de pensar demasiado en todo overthinking',
     'por que evitas el conflicto aunque te este lastimando',
     'como hablar con tus hijos sobre salud mental',
-    'señales de que eres una persona altamente sensible',
+    'seÃƒÆ’Ã‚Â±ales de que eres una persona altamente sensible',
     'como manejar la ansiedad en el trabajo sin renunciar',
     'por que te cuesta perdonar y como hacerlo de verdad',
     'como vivir con alguien que tiene depresion',
@@ -88,18 +91,18 @@ TEMAS = [
     'como sanar el miedo al abandono en adultos',
     'por que te autosaboteas en el amor',
     'como manejar la ira sin explotar contra los que amas',
-    'señales de codependencia emocional y como salir',
+    'seÃƒÆ’Ã‚Â±ales de codependencia emocional y como salir',
     'como meditar cuando tu mente no para ni un segundo',
     'por que el ejercicio es mejor que cualquier antidepresivo',
     'como manejar la ansiedad social en reuniones y eventos'
 ]
 
 COMENTARIOS_FIJOS = [
-    'Estoy aqui para escucharte. Cuéntame en los comentarios: ¿te identificas con esto? No estás solo/a. 💙',
-    '¿Alguna vez has sentido exactamente esto? Escríbelo abajo. Tu historia puede ayudar a alguien más. 🙏',
-    'Este video es para quien lo necesita hoy. ¿A quién se lo enviarías? Etiquétalo abajo. ❤️',
-    '¿Qué parte de este video te llegó más al corazón? Cuéntame, estoy leyendo todos los comentarios. 💚',
-    'El primer paso para sanar es hablarlo. ¿Cómo te sientes hoy? Escríbelo aquí, sin miedo. 🌱',
+    'Estoy aqui para escucharte. CuÃƒÆ’Ã‚Â©ntame en los comentarios: Ãƒâ€šÃ‚Â¿te identificas con esto? No estÃƒÆ’Ã‚Â¡s solo/a. ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã¢â€žÂ¢',
+    'Ãƒâ€šÃ‚Â¿Alguna vez has sentido exactamente esto? EscrÃƒÆ’Ã‚Â­belo abajo. Tu historia puede ayudar a alguien mÃƒÆ’Ã‚Â¡s. ÃƒÂ°Ã…Â¸Ã¢â€žÂ¢Ã‚Â',
+    'Este video es para quien lo necesita hoy. Ãƒâ€šÃ‚Â¿A quiÃƒÆ’Ã‚Â©n se lo enviarÃƒÆ’Ã‚Â­as? EtiquÃƒÆ’Ã‚Â©talo abajo. ÃƒÂ¢Ã‚ÂÃ‚Â¤ÃƒÂ¯Ã‚Â¸Ã‚Â',
+    'Ãƒâ€šÃ‚Â¿QuÃƒÆ’Ã‚Â© parte de este video te llegÃƒÆ’Ã‚Â³ mÃƒÆ’Ã‚Â¡s al corazÃƒÆ’Ã‚Â³n? CuÃƒÆ’Ã‚Â©ntame, estoy leyendo todos los comentarios. ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã…Â¡',
+    'El primer paso para sanar es hablarlo. Ãƒâ€šÃ‚Â¿CÃƒÆ’Ã‚Â³mo te sientes hoy? EscrÃƒÆ’Ã‚Â­belo aquÃƒÆ’Ã‚Â­, sin miedo. ÃƒÂ°Ã…Â¸Ã…â€™Ã‚Â±',
 ]
 
 PALETAS_THUMBNAIL = [
@@ -165,7 +168,7 @@ Responde SOLO con JSON puro sin markdown ni texto extra:
 
 async def tts_con_srt(texto, audio_file, srt_file, voz):
     import edge_tts
-    communicate = edge_tts.Communicate(texto, voz)
+    communicate = edge_tts.Communicate(texto, voz, rate=VOZ_RATE, pitch=VOZ_PITCH, volume=VOZ_VOLUME)
     words = []
     audio_data = b''
     async for chunk in communicate.stream():
@@ -231,7 +234,7 @@ def mezclar_audio(voz_mp3, musica, salida, vol=0.09):
         print('Mezcla fallida - solo voz')
 
 def limpiar_emojis(texto):
-    emojis = ['😰','🧠','💙','❤️','🌱','🔥','⚡','💪','🙏','😔','😢','💊','🚨','⚠️','✅','🎯','💡','🧘','🌿','💚','💛','🤍','💜','🧡','😥','😓','🤯','💔','🫀','🫁','🧬','🩺','💭','🗣️','👁️','🌊','⛈️','🌈','🦋','🕊️','✨','🌟','⭐','💫','🎭','🎪','🎨']
+    emojis = ['ÃƒÂ°Ã…Â¸Ã‹Å“Ã‚Â°','ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â ','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã¢â€žÂ¢','ÃƒÂ¢Ã‚ÂÃ‚Â¤ÃƒÂ¯Ã‚Â¸Ã‚Â','ÃƒÂ°Ã…Â¸Ã…â€™Ã‚Â±','ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â¥','ÃƒÂ¢Ã…Â¡Ã‚Â¡','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Âª','ÃƒÂ°Ã…Â¸Ã¢â€žÂ¢Ã‚Â','ÃƒÂ°Ã…Â¸Ã‹Å“Ã¢â‚¬Â','ÃƒÂ°Ã…Â¸Ã‹Å“Ã‚Â¢','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã…Â ','ÃƒÂ°Ã…Â¸Ã…Â¡Ã‚Â¨','ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â','ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦','ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¯','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¡','ÃƒÂ°Ã…Â¸Ã‚Â§Ã‹Å“','ÃƒÂ°Ã…Â¸Ã…â€™Ã‚Â¿','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã…Â¡','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã¢â‚¬Âº','ÃƒÂ°Ã…Â¸Ã‚Â¤Ã‚Â','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã…â€œ','ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â¡','ÃƒÂ°Ã…Â¸Ã‹Å“Ã‚Â¥','ÃƒÂ°Ã…Â¸Ã‹Å“Ã¢â‚¬Å“','ÃƒÂ°Ã…Â¸Ã‚Â¤Ã‚Â¯','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã¢â‚¬Â','ÃƒÂ°Ã…Â¸Ã‚Â«Ã¢â€šÂ¬','ÃƒÂ°Ã…Â¸Ã‚Â«Ã‚Â','ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â¬','ÃƒÂ°Ã…Â¸Ã‚Â©Ã‚Âº','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â­','ÃƒÂ°Ã…Â¸Ã¢â‚¬â€Ã‚Â£ÃƒÂ¯Ã‚Â¸Ã‚Â','ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚ÂÃƒÂ¯Ã‚Â¸Ã‚Â','ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â ','ÃƒÂ¢Ã¢â‚¬ÂºÃ‹â€ ÃƒÂ¯Ã‚Â¸Ã‚Â','ÃƒÂ°Ã…Â¸Ã…â€™Ã‹â€ ','ÃƒÂ°Ã…Â¸Ã‚Â¦Ã¢â‚¬Â¹','ÃƒÂ°Ã…Â¸Ã¢â‚¬Â¢Ã…Â ÃƒÂ¯Ã‚Â¸Ã‚Â','ÃƒÂ¢Ã…â€œÃ‚Â¨','ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â¸','ÃƒÂ¢Ã‚Â­Ã‚Â','ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â«','ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â­','ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Âª','ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¨']
     for e in emojis:
         texto = texto.replace(e, '')
     return texto.strip()
@@ -699,7 +702,7 @@ def agregar_comentario(youtube, video_id, comentario):
         print(f'Comentario error: {e}')
 
 def main():
-    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
+    send_telegram('ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â  <b>SaludMentalReal</b> ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
     videos_h = get_video_files('assets/videos_h_small')
@@ -758,13 +761,13 @@ def main():
 
     vid_id = subir_youtube(youtube, video_largo, titulo, descripcion, tags, thumbnail)
     agregar_comentario(youtube, vid_id, comentario_ancla)
-    send_telegram(f'✅ <b>Video largo subido</b>\n{titulo}\nhttps://youtu.be/{vid_id}')
+    send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ <b>Video largo subido</b>\n{titulo}\nhttps://youtu.be/{vid_id}')
 
     short_id = subir_youtube(youtube, video_short, titulo_short, descripcion, tags, is_short=True)
     agregar_comentario(youtube, short_id, comentario_ancla)
-    send_telegram(f'✅ <b>Short subido</b>\n{titulo_short}\nhttps://youtu.be/{short_id}')
+    send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ <b>Short subido</b>\n{titulo_short}\nhttps://youtu.be/{short_id}')
 
-    send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado\nTema: {tema}')
+    send_telegram(f'ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° <b>SaludMentalReal</b> ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Completado\nTema: {tema}')
 
 if __name__ == '__main__':
     main()
