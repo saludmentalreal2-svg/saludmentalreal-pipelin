@@ -16,6 +16,8 @@ VOZ_EN = 'en-US-GuyNeural'
 VOZ_RATE = '-10%'
 VOZ_PITCH = '-4Hz'
 VOZ_VOLUME = '+15%'
+PLAYLIST_ES_NAME = 'Salud Mental en Espanol'
+PLAYLIST_EN_NAME = 'Mental Health English'
 
 TEMAS_ES = [
     'como controlar la ansiedad en momentos de crisis',
@@ -97,7 +99,7 @@ TEMAS_ES = [
     'como salir de la depresion cuando no tienes fuerzas',
     'el papel de la alimentacion en tu salud mental',
     'como manejar crisis emocionales en el trabajo',
-    'por que te sientes tan solo rodeado de personas'
+    'por que te sientes solo rodeado de personas'
 ]
 
 TEMAS_EN = [
@@ -115,7 +117,7 @@ TEMAS_EN = [
     'social anxiety how to overcome it gradually',
     'low self esteem where it comes from and how to improve',
     'how to handle grief when you lose someone',
-    'signs you need psychological help',
+    'signs you need psychological help now',
     'mindfulness for beginners in 5 minutes a day',
     'how to stop procrastinating when anxiety paralyzes you',
     'imposter syndrome what it is and how to fight it',
@@ -127,33 +129,33 @@ QUERIES_PEXELS_H = [
     'therapy session calm', 'meditation nature peaceful', 'breathing exercise wellness',
     'mental health calm person', 'nature forest peaceful sunrise', 'yoga meditation outdoor',
     'person journaling calm', 'mindfulness breathing nature', 'peaceful lake morning',
-    'calm ocean waves beach', 'person walking nature path', 'counseling support',
-    'mental wellness calm', 'stress relief nature', 'emotional healing peaceful'
+    'calm ocean waves beach', 'person walking nature path', 'mental wellness calm',
+    'stress relief nature', 'emotional healing peaceful', 'counseling support'
 ]
 
 QUERIES_PEXELS_V = [
     'meditation vertical calm', 'person breathing vertical', 'nature vertical peaceful',
     'yoga vertical wellness', 'mindfulness vertical', 'forest vertical nature',
-    'ocean vertical waves', 'person thinking vertical', 'calm vertical portrait',
-    'wellness vertical nature'
+    'ocean vertical waves', 'person thinking vertical', 'wellness vertical nature',
+    'calm vertical portrait'
 ]
 
 COMENTARIOS_ES = [
-    'Estoy aqui para escucharte. Te identificas con esto? Cuentame abajo, no estas solo. 💙',
-    'Alguna vez sentiste exactamente esto? Tu historia puede ayudar a alguien mas. Escríbela abajo. 🙏',
-    'Este video es para quien lo necesita hoy. A quien se lo enviarias? 💚',
-    'Que parte de este video te llego mas? Cuentame, leo todos los comentarios. ❤️',
-    'El primer paso para sanar es hablarlo. Como te sientes hoy? Escribelo aqui. 🌱',
-    'Si esto te ayudo, imagina cuanto puede ayudar a alguien que conoces. Compartelo. 💙',
-    'Recuerda: pedir ayuda es el acto mas valiente que existe. Como estas hoy? 🤍',
+    'Estoy aqui para escucharte. Te identificas con esto? Cuentame abajo, no estas solo.',
+    'Alguna vez sentiste exactamente esto? Tu historia puede ayudar a alguien mas. Escribela abajo.',
+    'Este video es para quien lo necesita hoy. A quien se lo enviarias?',
+    'Que parte de este video te llego mas? Cuentame, leo todos los comentarios.',
+    'El primer paso para sanar es hablarlo. Como te sientes hoy? Escribelo aqui.',
+    'Si esto te ayudo, imagina cuanto puede ayudar a alguien que conoces. Compartelo.',
+    'Recuerda: pedir ayuda es el acto mas valiente que existe. Como estas hoy?',
 ]
 
 COMENTARIOS_EN = [
-    'I am here to listen. Does this resonate with you? Tell me below, you are not alone. 💙',
-    'Have you ever felt exactly this? Your story might help someone else. Share it below. 🙏',
-    'This video is for whoever needs it today. Who would you send this to? 💚',
-    'Which part of this video hit you the most? Tell me, I read every comment. ❤️',
-    'Remember: asking for help is the bravest thing you can do. How are you today? 🤍',
+    'I am here to listen. Does this resonate with you? Tell me below, you are not alone.',
+    'Have you ever felt exactly this? Your story might help someone else. Share it below.',
+    'This video is for whoever needs it today. Who would you send this to?',
+    'Which part of this video hit you the most? Tell me, I read every comment.',
+    'Remember: asking for help is the bravest thing you can do. How are you today?',
 ]
 
 PALETAS = [
@@ -165,8 +167,7 @@ PALETAS = [
 ]
 
 def limpiar_texto_voz(texto):
-    # Eliminar emojis y caracteres especiales que la voz pronuncia literalmente
-    texto = re.sub(r'[^\w\s\.,;:!?¿¡\-\(\)áéíóúñüÁÉÍÓÚÑÜ]', '', texto)
+    texto = re.sub(r'[^\w\s\.,;:!?\-\(\)áéíóúñüÁÉÍÓÚÑÜa-zA-Z0-9]', ' ', texto)
     texto = re.sub(r'\s+', ' ', texto)
     return texto.strip()
 
@@ -191,7 +192,47 @@ def get_youtube():
         creds.refresh(Request())
     return build('youtube', 'v3', credentials=creds)
 
-def descargar_videos_pexels(queries, orientacion, n=6):
+def buscar_playlist_existente(youtube, nombre):
+    try:
+        resp = youtube.playlists().list(part='snippet', mine=True, maxResults=50).execute()
+        for item in resp.get('items', []):
+            if nombre.lower() in item['snippet']['title'].lower():
+                print(f'Playlist encontrada: {item["snippet"]["title"]} ({item["id"]})')
+                return item['id']
+    except Exception as e:
+        print(f'Buscar playlist error: {e}')
+    return None
+
+def crear_playlist(youtube, nombre, descripcion, idioma='es'):
+    try:
+        pl = youtube.playlists().insert(part='snippet,status', body={
+            'snippet': {'title': nombre, 'description': descripcion, 'defaultLanguage': idioma},
+            'status': {'privacyStatus': 'public'}
+        }).execute()
+        print(f'Playlist creada: {nombre} ({pl["id"]})')
+        return pl['id']
+    except Exception as e:
+        print(f'Crear playlist error: {e}')
+        return None
+
+def obtener_o_crear_playlist(youtube, nombre, descripcion, idioma='es'):
+    pl_id = buscar_playlist_existente(youtube, nombre)
+    if pl_id:
+        return pl_id
+    return crear_playlist(youtube, nombre, descripcion, idioma)
+
+def agregar_a_playlist(youtube, video_id, playlist_id):
+    if not playlist_id: return
+    try:
+        youtube.playlistItems().insert(part='snippet', body={
+            'snippet': {'playlistId': playlist_id,
+                'resourceId': {'kind': 'youtube#video', 'videoId': video_id}}
+        }).execute()
+        print('Agregado a playlist OK')
+    except Exception as e:
+        print(f'Playlist add error: {e}')
+
+def descargar_videos_pexels(queries, orientacion, n=5):
     os.makedirs('/tmp/pexels', exist_ok=True)
     videos = []
     headers = {'Authorization': PEXELS_API_KEY}
@@ -227,7 +268,8 @@ def descargar_videos_pexels(queries, orientacion, n=6):
                     else:
                         vf = 'scale=608:1080:force_original_aspect_ratio=decrease,pad=608:1080:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1'
                     ok = run_ffmpeg(['ffmpeg','-y','-i',raw,'-vf',vf,'-t','12',
-                        '-c:v','libx264','-pix_fmt','yuv420p','-r','25','-an',proc], f'pexels_{len(videos)}')
+                        '-c:v','libx264','-pix_fmt','yuv420p','-r','25','-an',proc],
+                        f'pexels_{len(videos)}')
                     if ok and os.path.exists(proc) and os.path.getsize(proc) > 50000:
                         videos.append(proc)
                         print(f'  Video {len(videos)}/{n} OK')
@@ -235,7 +277,6 @@ def descargar_videos_pexels(queries, orientacion, n=6):
                     print(f'  Item error: {e}')
         except Exception as e:
             print(f'Pexels error: {e}')
-    # Fallback a assets locales
     if len(videos) < 2:
         carpeta = 'assets/videos_h_small' if orientacion == 'landscape' else 'assets/videos_v_small'
         if os.path.exists(carpeta):
@@ -251,50 +292,45 @@ def generar_guion(tema, idioma='es'):
     if idioma == 'es':
         prompt = f'''Eres un psicologo clinico latinoamericano con canal viral de YouTube.
 Estilo: empatico, directo, conversacional. Como un amigo que entiende tu dolor.
-IMPORTANTE: No uses emojis, asteriscos, hashtags ni caracteres especiales en el guion.
-Solo texto limpio con puntos y comas para pausas naturales.
-Estructura obligatoria:
-  1. GANCHO: pregunta o dato impactante en menos de 12 palabras
-  2. VALIDACION: que no estan solos, sus sentimientos son validos
-  3. EXPLICACION: el problema en terminos simples con ejemplos del dia a dia
-  4. SOLUCION: 3 pasos concretos que puedan aplicar hoy mismo
-  5. CIERRE: mensaje de esperanza y motivacion a comentar
+CRITICO: El guion sera leido por una voz sintetica. NO uses emojis, asteriscos, hashtags, 
+ni ningun simbolo especial en el guion o guion_short. Solo texto limpio con puntos y comas.
+
+Estructura guion:
+  1. GANCHO: pregunta o dato impactante menos de 12 palabras
+  2. VALIDACION: sus sentimientos son validos, no estan solos
+  3. EXPLICACION: el problema en terminos simples con ejemplos cotidianos
+  4. SOLUCION: 3 pasos concretos aplicables hoy
+  5. CIERRE: esperanza real e invitacion a comentar
 
 Tema: {tema}
 
-Responde SOLO con JSON puro sin markdown:
+JSON puro sin markdown:
 {{
-  "titulo": "titulo viral en español con 2 emojis al inicio, numero o pregunta impactante, maximo 68 caracteres, sin hashtags en el titulo",
-  "descripcion": "500 palabras estructuradas: primera linea pregunta engancha, segunda linea invita a suscribirse y activar campana, parrafos con emojis relevantes, timestamps: 0:00 Introduccion | 0:45 El problema real | 1:30 Por que te sucede | 2:45 3 soluciones que funcionan | 4:00 Mensaje de esperanza, parrafo sobre recursos de ayuda en crisis, 25 hashtags al final: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness #CrecimientoPersonal #TerapiaOnline #SaludMentalMexico #SaludMentalColombia #PsicologiaPositiva #MenteClara #SaludMentalJovenes #AnsiedadSocial #VidaSaludable #SuperacionPersonal #SaludMentalLatam #PsicologiaColombia #PsicologiaMexico #MentePositiva #BienEstar",
-  "guion": "520 palabras texto limpio sin emojis ni simbolos. Frases cortas maxima 10 palabras separadas por punto. Pausas con comas. Natural y empatico. Primera persona plural. Sin asteriscos ni hashtags.",
+  "titulo": "titulo viral en español con 2 emojis al inicio, numero o pregunta impactante, maximo 68 caracteres, NO hashtags en titulo",
+  "descripcion": "500 palabras: primera linea pregunta engancha, segunda linea invita suscribirse y campana, parrafos con emojis, timestamps: 0:00 Introduccion | 0:45 El problema real | 1:30 Por que te sucede | 2:45 Tres soluciones | 4:00 Mensaje final, parrafo recursos de crisis, 25 hashtags al final",
+  "guion": "520 palabras SOLO TEXTO LIMPIO sin emojis sin simbolos sin hashtags. Frases max 10 palabras. Pausas con puntos y comas. Primera persona plural. Natural y empatico.",
   "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","SuperacionPersonal","VidaSaludable","MenteClara","TerapiaOnline","SaludMentalJovenes","AnsiedadSocial","ManejoDeLaAnsiedad","SaludEmocional","PsicologiaColombia","PsicologiaMexico","SaludMentalLatam","MentePositiva","BienEstar"],
-  "guion_short": "80 palabras texto limpio sin emojis ni simbolos. Frases max 8 palabras. Dato impactante inicio. Pregunta empatica final.",
-  "titulo_short": "titulo Short en español 2 emojis max 48 caracteres sin hashtags",
-  "comentario_ancla": "comentario empatico 2 lineas sin emojis que invite a la comunidad a comentar"
+  "guion_short": "80 palabras SOLO TEXTO LIMPIO sin emojis sin simbolos. Frases max 8 palabras. Dato impactante inicio. Pregunta empatica final.",
+  "titulo_short": "titulo Short español 2 emojis max 48 caracteres sin hashtags",
+  "comentario_ancla": "comentario empatico 2 lineas sin emojis invitando a comentar"
 }}'''
     else:
         prompt = f'''You are a clinical psychologist with a viral YouTube channel.
 Style: empathetic, direct, conversational. Like a friend who truly understands pain.
-IMPORTANT: No emojis, asterisks, hashtags or special characters in the script.
-Clean text only with periods and commas for natural pauses.
-Structure:
-  1. HOOK: impactful question or fact in less than 12 words
-  2. VALIDATION: they are not alone, their feelings are valid
-  3. EXPLANATION: the problem in simple terms with everyday examples
-  4. SOLUTION: 3 concrete steps they can apply today
-  5. CLOSING: message of hope and invitation to comment
+CRITICAL: The script will be read by synthetic voice. NO emojis, asterisks, hashtags
+or special symbols in guion or guion_short. Clean text only with periods and commas.
 
 Topic: {tema}
 
-Respond ONLY with pure JSON no markdown:
+Pure JSON no markdown:
 {{
-  "titulo": "viral English title with 2 emojis at start, number or impactful question, max 68 characters, no hashtags in title",
-  "descripcion": "400 words: first line engaging question, second line subscribe and bell, paragraphs with relevant emojis, timestamps: 0:00 Introduction | 0:45 The real problem | 1:30 Why it happens | 2:45 3 solutions | 4:00 Message of hope, crisis resources paragraph, 20 hashtags: #MentalHealth #Anxiety #Depression #EmotionalWellness #Psychology #MindOverMatter #MentalHealthMatters #SelfCare #Motivation #Mindfulness #PersonalGrowth #Therapy #MentalHealthAwareness #AnxietyRelief #HealingJourney #EmotionalHealth #MentalWellness #SelfLove #Mindset #PositivePsychology",
-  "guion": "450 words clean text no emojis or symbols. Short sentences max 10 words separated by periods. Natural and empathetic. First person plural. No asterisks or hashtags.",
+  "titulo": "viral English title 2 emojis at start, number or impactful question, max 68 chars, NO hashtags in title",
+  "descripcion": "400 words: engaging question, subscribe line, emoji paragraphs, timestamps: 0:00 Introduction | 0:45 The problem | 1:30 Why it happens | 2:45 Three solutions | 4:00 Hope message, crisis resources, 20 hashtags at end",
+  "guion": "450 words CLEAN TEXT ONLY no emojis no symbols no hashtags. Max 10 words per sentence. Natural empathetic. First person plural.",
   "tags": ["MentalHealth","Anxiety","Depression","EmotionalWellness","Psychology","MindOverMatter","MentalHealthMatters","SelfCare","Motivation","Mindfulness","PersonalGrowth","Therapy","MentalHealthAwareness","AnxietyRelief","HealingJourney","EmotionalHealth","MentalWellness","SelfLove","Mindset","PositivePsychology"],
-  "guion_short": "70 words clean text no emojis or symbols. Max 8 words per sentence. Impactful opening. Empathetic question at end.",
-  "titulo_short": "English Short title 2 emojis max 48 characters no hashtags",
-  "comentario_ancla": "empathetic 2 line comment no emojis inviting community to share"
+  "guion_short": "70 words CLEAN TEXT ONLY no emojis no symbols. Max 8 words per sentence. Impactful opening. Empathetic question at end.",
+  "titulo_short": "English Short title 2 emojis max 48 chars no hashtags",
+  "comentario_ancla": "empathetic 2 line comment no emojis inviting community"
 }}'''
     resp = client.chat.completions.create(
         model='llama-3.3-70b-versatile',
@@ -321,7 +357,7 @@ async def tts_con_srt(texto, audio_file, srt_file, voz):
             })
     with open(audio_file, 'wb') as f:
         f.write(audio_data)
-    print(f'TTS [{voz}] OK: {len(audio_data)} bytes | Palabras: {len(words)}')
+    print(f'TTS [{voz}]: {len(audio_data)} bytes | {len(words)} palabras')
     if words:
         def fmt(s):
             h, m = int(s//3600), int((s%3600)//60)
@@ -335,7 +371,7 @@ async def tts_con_srt(texto, audio_file, srt_file, voz):
         with open(srt_file, 'w', encoding='utf-8') as f:
             for i, g in enumerate(grupos):
                 f.write(f"{i+1}\n{fmt(g[0]['start'])} --> {fmt(g[-1]['end'])}\n{' '.join(x['word'] for x in g)}\n\n")
-        print(f'SRT OK: {len(grupos)} grupos')
+        print(f'SRT: {len(grupos)} grupos OK')
         return True
     return False
 
@@ -368,10 +404,11 @@ def mezclar_audio(voz_mp3, musica, salida, vol=0.08):
 
 def agregar_marca_agua(video_in, video_out, w=1280, h=720):
     try:
-        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 28 if w==1280 else 20)
+        font_size = 28 if w == 1280 else 20
+        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', font_size)
     except:
         font = ImageFont.load_default()
-    img = Image.new('RGBA', (w, 60), (0,0,0,0))
+    img = Image.new('RGBA', (w, 50), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     try:
         bbox = draw.textbbox((0,0), CHANNEL_HANDLE, font=font)
@@ -379,13 +416,13 @@ def agregar_marca_agua(video_in, video_out, w=1280, h=720):
     except:
         tw = len(CHANNEL_HANDLE)*14
     x = (w-tw)//2
-    draw.text((x+2, 12), CHANNEL_HANDLE, font=font, fill=(0,0,0,180))
-    draw.text((x, 10), CHANNEL_HANDLE, font=font, fill=(255,255,255,200))
+    draw.text((x+2,10), CHANNEL_HANDLE, font=font, fill=(0,0,0,160))
+    draw.text((x,8), CHANNEL_HANDLE, font=font, fill=(255,255,255,210))
     marca_path = '/tmp/marca_agua.png'
     img.save(marca_path)
     ok = run_ffmpeg([
         'ffmpeg','-y','-i',video_in,'-i',marca_path,
-        '-filter_complex',f'[1:v]scale={w}:60[wm];[0:v][wm]overlay=(W-w)/2:10',
+        '-filter_complex',f'[1:v]scale={w}:50[wm];[0:v][wm]overlay=(W-w)/2:8',
         '-c:v','libx264','-pix_fmt','yuv420p','-preset','fast',video_out
     ], 'marca_agua')
     return ok and os.path.exists(video_out) and os.path.getsize(video_out) > 10000
@@ -427,7 +464,7 @@ def crear_thumbnail(titulo, archivo, paleta=None):
             if draw.textbbox((0,0),test,font=font_big)[2] < W-140: linea=test
             else:
                 if linea: lineas.append(linea)
-                linea = p
+                linea=p
         except: linea=test
     if linea: lineas.append(linea)
     total_h = len(lineas)*88
@@ -443,7 +480,7 @@ def crear_thumbnail(titulo, archivo, paleta=None):
     try: tw2=draw.textbbox((0,0),CHANNEL_HANDLE,font=font_med)[2]
     except: tw2=300
     draw.text(((W-tw2)//2,H-52),CHANNEL_HANDLE,font=font_med,fill=paleta['acento'])
-    img.save(arquivo if False else archivo, quality=95)
+    img.save(archivo, quality=95)
 
 def agregar_subtitulos(video_in, srt_file, video_out, fontsize=20, margenv=40):
     if not srt_file or not os.path.exists(srt_file) or os.path.getsize(srt_file)<10:
@@ -455,12 +492,12 @@ def agregar_subtitulos(video_in, srt_file, video_out, fontsize=20, margenv=40):
         'ffmpeg','-y','-i',video_in,
         '-vf',f"subtitles='{srt_esc}':force_style='{style}'",
         '-c:v','libx264','-pix_fmt','yuv420p','-preset','fast',video_out
-    ], f'subs')
+    ], 'subs')
     return ok and os.path.exists(video_out) and os.path.getsize(video_out)>10000
 
 def crear_video(audio_file, srt_file, videos, output_file, w=1280, h=720, is_short=False):
     duracion = get_audio_duration(audio_file)
-    print(f'Duracion: {duracion:.1f}s')
+    print(f'Creando video {w}x{h} | Audio: {duracion:.1f}s')
     dur_clip = 9
     n_clips = max(3, int(duracion/dur_clip)+3)
     clips = []
@@ -470,7 +507,7 @@ def crear_video(audio_file, srt_file, videos, output_file, w=1280, h=720, is_sho
         clip = f'/tmp/clip_{w}_{i}.mp4'
         vf = f'scale={w}:{h}:force_original_aspect_ratio=decrease,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1'
         ok = run_ffmpeg(['ffmpeg','-y','-i',src,'-vf',vf,'-t',str(dur_clip),
-            '-c:v','libx264','-pix_fmt','yuv420p','-r','25','-an',clip],f'clip_{i}')
+            '-c:v','libx264','-pix_fmt','yuv420p','-r','25','-an',clip], f'clip_{i}')
         if os.path.exists(clip) and os.path.getsize(clip)>5000:
             clips.append(clip)
     if not clips:
@@ -480,20 +517,19 @@ def crear_video(audio_file, srt_file, videos, output_file, w=1280, h=720, is_sho
         for c in clips: f.write(f"file '{c}'\n")
     video_mudo = f'/tmp/mudo_{w}.mp4'
     run_ffmpeg(['ffmpeg','-y','-f','concat','-safe','0','-i',lista,
-        '-c:v','libx264','-pix_fmt','yuv420p',video_mudo],'concat')
-    # Subtitulos
+        '-c:v','libx264','-pix_fmt','yuv420p',video_mudo], 'concat')
     video_subs = f'/tmp/subs_{w}.mp4'
-    subs_ok = agregar_subtitulos(video_mudo, srt_file, video_subs, 18 if not is_short else 16, 40 if not is_short else 55)
+    subs_ok = agregar_subtitulos(video_mudo, srt_file, video_subs,
+        18 if not is_short else 16, 40 if not is_short else 55)
     video_base = video_subs if subs_ok else video_mudo
-    # Marca de agua
     video_marca = f'/tmp/marca_{w}.mp4'
     marca_ok = agregar_marca_agua(video_base, video_marca, w, h)
-    video_final_base = video_marca if marca_ok else video_base
-    # Audio final
-    run_ffmpeg(['ffmpeg','-y','-i',video_final_base,'-i',audio_file,
+    video_final = video_marca if marca_ok else video_base
+    run_ffmpeg(['ffmpeg','-y','-i',video_final,'-i',audio_file,
         '-map','0:v','-map','1:a','-c:v','copy','-c:a','aac',
-        '-b:a','192k' if not is_short else '128k','-shortest',output_file],'final')
-    print(f'Video {"CON" if subs_ok else "SIN"} subs | {"CON" if marca_ok else "SIN"} marca')
+        '-b:a','192k' if not is_short else '128k','-shortest',output_file], 'final')
+    size = os.path.getsize(output_file) if os.path.exists(output_file) else 0
+    print(f'Video OK: {size//1024}KB | subs:{"si" if subs_ok else "no"} | marca:{"si" if marca_ok else "no"}')
 
 def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None, is_short=False, idioma='es'):
     if not os.path.exists(video_file) or os.path.getsize(video_file)<10000:
@@ -502,12 +538,9 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
         titulo = titulo+' #Shorts'
     body = {
         'snippet': {
-            'title': titulo[:100],
-            'description': descripcion,
-            'tags': tags,
-            'categoryId': '26',
-            'defaultLanguage': idioma,
-            'defaultAudioLanguage': idioma
+            'title': titulo[:100], 'description': descripcion,
+            'tags': tags, 'categoryId': '26',
+            'defaultLanguage': idioma, 'defaultAudioLanguage': idioma
         },
         'status': {'privacyStatus': 'public', 'selfDeclaredMadeForKids': False}
     }
@@ -529,50 +562,35 @@ def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None
 def agregar_comentario(youtube, video_id, comentario):
     try:
         youtube.commentThreads().insert(part='snippet', body={
-            'snippet': {'videoId': video_id, 'topLevelComment': {'snippet': {'textOriginal': comentario}}}
+            'snippet': {'videoId': video_id,
+                'topLevelComment': {'snippet': {'textOriginal': comentario}}}
         }).execute()
         print('Comentario OK')
     except Exception as e:
         print(f'Comentario error: {e}')
 
-def crear_o_obtener_playlist(youtube, titulo, descripcion):
-    try:
-        pl = youtube.playlists().insert(part='snippet,status', body={
-            'snippet': {'title': titulo, 'description': descripcion, 'defaultLanguage': 'es'},
-            'status': {'privacyStatus': 'public'}
-        }).execute()
-        return pl['id']
-    except Exception as e:
-        print(f'Playlist error: {e}')
-        return None
-
-def agregar_a_playlist(youtube, video_id, playlist_id):
-    if not playlist_id: return
-    try:
-        youtube.playlistItems().insert(part='snippet', body={
-            'snippet': {'playlistId': playlist_id, 'resourceId': {'kind': 'youtube#video', 'videoId': video_id}}
-        }).execute()
-        print('Playlist OK')
-    except Exception as e:
-        print(f'Playlist add error: {e}')
-
 def main():
     send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
-    # Descargar videos de Pexels
     print('Descargando videos Pexels...')
-    videos_h = descargar_videos_pexels(QUERIES_PEXELS_H, 'landscape', 6)
-    videos_v = descargar_videos_pexels(QUERIES_PEXELS_V, 'portrait', 4)
+    videos_h = descargar_videos_pexels(QUERIES_PEXELS_H, 'landscape', 5)
+    videos_v = descargar_videos_pexels(QUERIES_PEXELS_V, 'portrait', 3)
 
     if not videos_h or not videos_v:
         send_telegram('ERROR: Sin videos disponibles')
         sys.exit(1)
 
     musica = get_music_file()
-    print(f'Videos: {len(videos_h)}H | {len(videos_v)}V | Musica: {bool(musica)}')
+    youtube = get_youtube()
 
-    # Generar contenido ES
+    # Obtener o crear playlists (una sola vez, no duplicar)
+    pl_es = obtener_o_crear_playlist(youtube, PLAYLIST_ES_NAME,
+        'Videos de psicologia y bienestar emocional en español latino', 'es')
+    pl_en = obtener_o_crear_playlist(youtube, PLAYLIST_EN_NAME,
+        'Psychology and emotional wellness videos in English', 'en')
+
+    # Generar contenido ES e IN paralelo
     tema_es = random.choice(TEMAS_ES)
     tema_en = random.choice(TEMAS_EN)
     print(f'Tema ES: {tema_es}')
@@ -581,7 +599,7 @@ def main():
     datos_es = generar_guion(tema_es, 'es')
     datos_en = generar_guion(tema_en, 'en')
 
-    # TTS ES
+    # TTS
     audio_es = '/tmp/smr/audio_es.mp3'
     srt_es = '/tmp/subs_es.srt'
     asyncio.run(tts_con_srt(datos_es['guion'], audio_es, srt_es, VOZ_ES))
@@ -590,7 +608,6 @@ def main():
     srt_es_short = '/tmp/subs_es_short.srt'
     asyncio.run(tts_con_srt(datos_es['guion_short'], audio_es_short, srt_es_short, VOZ_ES))
 
-    # TTS EN
     audio_en = '/tmp/smr/audio_en.mp3'
     srt_en = '/tmp/subs_en.srt'
     asyncio.run(tts_con_srt(datos_en['guion'], audio_en, srt_en, VOZ_EN))
@@ -599,21 +616,20 @@ def main():
     srt_en_short = '/tmp/subs_en_short.srt'
     asyncio.run(tts_con_srt(datos_en['guion_short'], audio_en_short, srt_en_short, VOZ_EN))
 
-    # Mezclar musica
+    # Mezcla audio
     def mix(voz, salida):
-        if musica:
-            mezclar_audio(voz, musica, salida)
+        if musica: mezclar_audio(voz, musica, salida)
         else:
             import shutil; shutil.copy(voz, salida)
 
-    audio_largo_es = '/tmp/smr/largo_es.mp3'
-    mix(audio_es, audio_largo_es)
-    audio_short_es = '/tmp/smr/short_es.mp3'
-    mix(audio_es_short, audio_short_es)
-    audio_largo_en = '/tmp/smr/largo_en.mp3'
-    mix(audio_en, audio_largo_en)
-    audio_short_en = '/tmp/smr/short_en.mp3'
-    mix(audio_en_short, audio_short_en)
+    largo_es = '/tmp/smr/largo_es.mp3'
+    short_es_audio = '/tmp/smr/short_es.mp3'
+    largo_en = '/tmp/smr/largo_en.mp3'
+    short_en_audio = '/tmp/smr/short_en.mp3'
+    mix(audio_es, largo_es)
+    mix(audio_es_short, short_es_audio)
+    mix(audio_en, largo_en)
+    mix(audio_en_short, short_en_audio)
 
     # Thumbnails
     thumb_es = '/tmp/smr/thumb_es.jpg'
@@ -621,50 +637,46 @@ def main():
     crear_thumbnail(datos_es['titulo'], thumb_es)
     crear_thumbnail(datos_en['titulo'], thumb_en)
 
-    # Videos ES
-    video_largo_es = '/tmp/smr/video_largo_es.mp4'
-    crear_video(audio_largo_es, srt_es, videos_h, video_largo_es, 1280, 720)
+    # Crear videos
+    vid_largo_es = '/tmp/smr/video_largo_es.mp4'
+    crear_video(largo_es, srt_es, videos_h, vid_largo_es, 1280, 720)
 
-    video_short_es = '/tmp/smr/video_short_es.mp4'
-    crear_video(audio_short_es, srt_es_short, videos_v, video_short_es, 608, 1080, True)
+    vid_short_es = '/tmp/smr/video_short_es.mp4'
+    crear_video(short_es_audio, srt_es_short, videos_v, vid_short_es, 608, 1080, True)
 
-    # Videos EN
-    video_largo_en = '/tmp/smr/video_largo_en.mp4'
-    crear_video(audio_largo_en, srt_en, videos_h, video_largo_en, 1280, 720)
+    vid_largo_en = '/tmp/smr/video_largo_en.mp4'
+    crear_video(largo_en, srt_en, videos_h, vid_largo_en, 1280, 720)
 
-    video_short_en = '/tmp/smr/video_short_en.mp4'
-    crear_video(audio_short_en, srt_en_short, videos_v, video_short_en, 608, 1080, True)
+    vid_short_en = '/tmp/smr/video_short_en.mp4'
+    crear_video(short_en_audio, srt_en_short, videos_v, vid_short_en, 608, 1080, True)
 
-    # Subir a YouTube
-    youtube = get_youtube()
+    # Subir video largo ES
+    id_es = subir_youtube(youtube, vid_largo_es, datos_es['titulo'],
+        datos_es['descripcion'], datos_es['tags'], thumb_es, idioma='es')
+    agregar_comentario(youtube, id_es, datos_es.get('comentario_ancla', random.choice(COMENTARIOS_ES)))
+    agregar_a_playlist(youtube, id_es, pl_es)
+    send_telegram(f'✅ <b>Video ES</b>\n{datos_es["titulo"]}\nhttps://youtu.be/{id_es}')
 
-    # Playlist ES y EN
-    pl_es = crear_o_obtener_playlist(youtube, 'Salud Mental en Español', 'Videos de psicologia y bienestar emocional en español latino')
-    pl_en = crear_o_obtener_playlist(youtube, 'Mental Health English', 'Psychology and emotional wellness videos in English')
+    # Subir short ES
+    id_short_es = subir_youtube(youtube, vid_short_es, datos_es['titulo_short'],
+        datos_es['descripcion'], datos_es['tags'], is_short=True, idioma='es')
+    agregar_comentario(youtube, id_short_es, random.choice(COMENTARIOS_ES))
+    agregar_a_playlist(youtube, id_short_es, pl_es)
+    send_telegram(f'✅ <b>Short ES</b>\n{datos_es["titulo_short"]}\nhttps://youtu.be/{id_short_es}')
 
-    # Video largo ES
-    vid_es = subir_youtube(youtube, video_largo_es, datos_es['titulo'], datos_es['descripcion'], datos_es['tags'], thumb_es, idioma='es')
-    agregar_comentario(youtube, vid_es, datos_es.get('comentario_ancla', random.choice(COMENTARIOS_ES)))
-    agregar_a_playlist(youtube, vid_es, pl_es)
-    send_telegram(f'✅ <b>Video ES subido</b>\n{datos_es["titulo"]}\nhttps://youtu.be/{vid_es}')
+    # Subir video largo EN
+    id_en = subir_youtube(youtube, vid_largo_en, datos_en['titulo'],
+        datos_en['descripcion'], datos_en['tags'], thumb_en, idioma='en')
+    agregar_comentario(youtube, id_en, datos_en.get('comentario_ancla', random.choice(COMENTARIOS_EN)))
+    agregar_a_playlist(youtube, id_en, pl_en)
+    send_telegram(f'✅ <b>Video EN</b>\n{datos_en["titulo"]}\nhttps://youtu.be/{id_en}')
 
-    # Short ES
-    short_es = subir_youtube(youtube, video_short_es, datos_es['titulo_short'], datos_es['descripcion'], datos_es['tags'], is_short=True, idioma='es')
-    agregar_comentario(youtube, short_es, random.choice(COMENTARIOS_ES))
-    agregar_a_playlist(youtube, short_es, pl_es)
-    send_telegram(f'✅ <b>Short ES subido</b>\n{datos_es["titulo_short"]}\nhttps://youtu.be/{short_es}')
-
-    # Video largo EN
-    vid_en = subir_youtube(youtube, video_largo_en, datos_en['titulo'], datos_en['descripcion'], datos_en['tags'], thumb_en, idioma='en')
-    agregar_comentario(youtube, vid_en, datos_en.get('comentario_ancla', random.choice(COMENTARIOS_EN)))
-    agregar_a_playlist(youtube, vid_en, pl_en)
-    send_telegram(f'✅ <b>Video EN subido</b>\n{datos_en["titulo"]}\nhttps://youtu.be/{vid_en}')
-
-    # Short EN
-    short_en = subir_youtube(youtube, video_short_en, datos_en['titulo_short'], datos_en['descripcion'], datos_en['tags'], is_short=True, idioma='en')
-    agregar_comentario(youtube, short_en, random.choice(COMENTARIOS_EN))
-    agregar_a_playlist(youtube, short_en, pl_en)
-    send_telegram(f'✅ <b>Short EN subido</b>\n{datos_en["titulo_short"]}\nhttps://youtu.be/{short_en}')
+    # Subir short EN
+    id_short_en = subir_youtube(youtube, vid_short_en, datos_en['titulo_short'],
+        datos_en['descripcion'], datos_en['tags'], is_short=True, idioma='en')
+    agregar_comentario(youtube, id_short_en, random.choice(COMENTARIOS_EN))
+    agregar_a_playlist(youtube, id_short_en, pl_en)
+    send_telegram(f'✅ <b>Short EN</b>\n{datos_en["titulo_short"]}\nhttps://youtu.be/{id_short_en}')
 
     send_telegram(f'🎉 <b>SaludMentalReal</b> — 4 videos publicados\nES: {tema_es}\nEN: {tema_en}')
 
