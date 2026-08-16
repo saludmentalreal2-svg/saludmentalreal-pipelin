@@ -32,4 +32,5 @@ jobs:
           TOKEN_PICKLE_B64: ${{ secrets.TOKEN_PICKLE_B64 }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: python scripts/pipeline.py
