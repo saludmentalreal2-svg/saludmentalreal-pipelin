@@ -14,8 +14,8 @@ CHANNEL_NAME = 'SaludMentalReal'
 CHANNEL_HANDLE = '@SaludMentalReal1'
 VOZ_ES = 'es-MX-JorgeNeural'
 VOZ_EN = 'en-US-GuyNeural'
-VOZ_RATE = '-10%'
-VOZ_PITCH = '-4Hz'
+VOZ_RATE = random.choice(['-8%', '-10%', '-12%'])
+VOZ_PITCH = random.choice(['-3Hz', '-4Hz', '-5Hz'])
 VOZ_VOLUME = '+15%'
 PLAYLIST_ES_NAME = 'Salud Mental en Espanol'
 PLAYLIST_EN_NAME = 'Mental Health English'
@@ -25,7 +25,7 @@ TEMAS_ES = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres',
     'como dormir mejor cuando la mente no para',
-    'señales de burnout y como recuperarte',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie explica',
     'como salir de una adiccion cuando no puedes',
@@ -36,7 +36,7 @@ TEMAS_ES = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'señales de que necesitas ayuda psicologica',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos',
     'como dejar de procrastinar cuando la ansiedad paraliza',
     'el sindrome del impostor como combatirlo',
@@ -54,7 +54,7 @@ TEMAS_ES = [
     'como decirle no a personas toxicas',
     'por que te sientes vacio sin razon',
     'como dejar de buscar aprobacion de los demas',
-    'señales de inmadurez emocional',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de inmadurez emocional',
     'como sanar relaciones toxicas',
     'el miedo al rechazo y como vencerlo',
     'por que te saboteas inconscientemente',
@@ -64,7 +64,7 @@ TEMAS_ES = [
     'que es la ansiedad generalizada y como tratarla',
     'por que lloras sin razon',
     'como dejar de compararte en redes sociales',
-    'señales de trauma emocional sin saberlo',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de trauma emocional sin saberlo',
     'como manejar la soledad cuando vives solo',
     'por que sientes que no encajas en ningun lado',
     'como recuperar la motivacion cuando todo da igual',
@@ -72,7 +72,7 @@ TEMAS_ES = [
     'como dejar de ser tan duro contigo mismo',
     'por que te cuesta ser feliz aunque tengas todo',
     'como superar el miedo al fracaso',
-    'señales de que necesitas terapia urgente',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de que necesitas terapia urgente',
     'como manejar relacion con alguien deprimido',
     'por que la ansiedad aparece de noche',
     'como hablar de salud mental sin que te juzguen',
@@ -80,20 +80,20 @@ TEMAS_ES = [
     'como salir del ciclo de la negatividad',
     'por que tienes miedo al exito',
     'como construir autoestima desde cero',
-    'señales de que una relacion daña tu salud mental',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de que una relacion daÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a tu salud mental',
     'como manejar los celos sin destruir tu relacion',
     'por que te sientes culpable de ser feliz',
     'como superar la traicion de alguien que amabas',
     'el efecto del alcohol en tu salud mental',
     'como dejar de pensar demasiado overthinking',
     'por que evitas el conflicto aunque te lastime',
-    'señales de que eres altamente sensible',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de que eres altamente sensible',
     'como manejar la ansiedad en el trabajo',
     'por que te cuesta perdonar de verdad',
     'el impacto de la familia toxica en tu salud mental',
     'como sanar el miedo al abandono en adultos',
     'por que te autosaboteas en el amor',
-    'señales de codependencia emocional',
+    'seÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ales de codependencia emocional',
     'como meditar cuando tu mente no para',
     'por que el ejercicio ayuda mas que un antidepresivo',
     'como manejar la ansiedad social en eventos',
@@ -132,7 +132,7 @@ SERIE_30_DIAS = [
     'Dia 25: como reconstruirte despues de una crisis',
     'Dia 26: el rol del sueno en tu bienestar emocional',
     'Dia 27: como mantener limites saludables',
-    'Dia 28: aprende a celebrar tus pequeños avances',
+    'Dia 28: aprende a celebrar tus pequeÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±os avances',
     'Dia 29: como prepararte para los dias dificiles',
     'Dia 30: has llegado lejos lo que sigue en tu camino'
 ]
@@ -165,14 +165,21 @@ QUERIES_PEXELS_H = [
     'mental health calm person', 'nature forest peaceful sunrise', 'yoga meditation outdoor',
     'person journaling calm', 'mindfulness breathing nature', 'peaceful lake morning',
     'calm ocean waves beach', 'person walking nature path', 'mental wellness calm',
-    'stress relief nature', 'emotional healing peaceful', 'counseling support'
+    'stress relief nature', 'emotional healing peaceful', 'counseling support',
+    'person meditating park', 'calm woman nature', 'man breathing outdoor',
+    'peaceful river nature', 'person stretching morning', 'wellness spa calm',
+    'nature birds peaceful', 'sunrise mountains calm', 'person reading calm',
+    'green nature peaceful morning'
 ]
 
 QUERIES_PEXELS_V = [
     'meditation vertical calm', 'person breathing vertical', 'nature vertical peaceful',
     'yoga vertical wellness', 'mindfulness vertical', 'forest vertical nature',
     'ocean vertical waves', 'person thinking vertical', 'wellness vertical nature',
-    'calm vertical portrait'
+    'calm vertical portrait', 'woman meditating vertical', 'man nature vertical',
+    'sunrise vertical peaceful', 'rain vertical nature', 'flowers vertical calm',
+    'person walking vertical', 'breathing vertical outdoor', 'tree vertical nature',
+    'mountain vertical calm', 'river vertical peaceful'
 ]
 
 QUERIES_PEXELS_THUMB = [
@@ -201,8 +208,8 @@ COMENTARIOS_EN = [
 ]
 
 COMMUNITY_POSTS_ES = [
-    'Pregunta del dia: Cual es la cosa mas pequeña que puedes hacer HOY por tu salud mental? Escribela abajo.',
-    'Si pudieras darle un consejo a tu yo de hace 5 años sobre salud mental, cual seria?',
+    'Pregunta del dia: Cual es la cosa mas pequeÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a que puedes hacer HOY por tu salud mental? Escribela abajo.',
+    'Si pudieras darle un consejo a tu yo de hace 5 aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±os sobre salud mental, cual seria?',
     'Verdad o mito: La ansiedad desaparece sola con el tiempo. Que piensas tu?',
     'Hoy te pregunto: Del 1 al 10, como esta tu salud mental esta semana? Sin juicios.',
     'Comparte una cosa que te ayuda cuando la ansiedad ataca. Puede ayudar a alguien mas.',
@@ -218,8 +225,26 @@ PALETAS = [
     {'fondo': (40,25,5), 'acento': (255,160,0), 'texto': (255,255,255)},
 ]
 
+def detectar_fecha_especial():
+    hoy = datetime.now()
+    if hoy.day == 10 and hoy.month == 10:
+        return 'dia_mundial_salud_mental'
+    if hoy.day == 10 and hoy.month == 9:
+        return 'dia_prevencion_suicidio'
+    if hoy.weekday() == 0:
+        return 'lunes_motivacional'
+    return None
+
+def get_tema_especial(tipo):
+    temas = {
+        'dia_mundial_salud_mental': ['hoy es el dia mundial de la salud mental por que importa tanto', 'dia mundial salud mental lo que todos debemos saber hoy'],
+        'dia_prevencion_suicidio': ['como ayudar a alguien que esta pensando en rendirse', 'hablar salva vidas lo que debes saber hoy'],
+        'lunes_motivacional': ['como empezar la semana con tu salud mental en orden', 'rutina de lunes para proteger tu mente toda la semana']
+    }
+    return random.choice(temas.get(tipo, [None]))
+
 def limpiar_texto_voz(texto):
-    texto = re.sub(r'[^\w\s\.,;:!?\-\(\)áéíóúñüÁÉÍÓÚÑÜa-zA-Z0-9]', ' ', texto)
+    texto = re.sub(r'[^\w\s\.,;:!?\-\(\)ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¹Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œa-zA-Z0-9]', ' ', texto)
     texto = re.sub(r'\s+', ' ', texto)
     return texto.strip()
 
@@ -411,12 +436,12 @@ Tema: {tema}
 
 JSON puro sin markdown:
 {{
-  "titulo": "titulo viral español 2 emojis inicio, numero o pregunta impactante, max 68 caracteres, sin hashtags",
+  "titulo": "titulo viral espaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ol 2 emojis inicio, numero o pregunta impactante, max 68 caracteres, sin hashtags",
   "descripcion": "500 palabras: primera linea pregunta engancha, segunda linea suscribirse y campana, parrafos con emojis relevantes, CAPITULOS: 0:00 Introduccion | 0:45 El problema real | 1:30 Por que te sucede | 2:45 3 soluciones que funcionan | 4:00 Mensaje de esperanza, recursos crisis LATAM con numeros reales, {link_anterior}, 25 hashtags: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness #CrecimientoPersonal #TerapiaOnline #SaludMentalMexico #SaludMentalColombia #PsicologiaPositiva #MenteClara #SaludMentalJovenes #AnsiedadSocial #VidaSaludable #SuperacionPersonal #SaludMentalLatam #PsicologiaColombia #PsicologiaMexico #MentePositiva #BienEstar",
   "guion": "520 palabras SOLO TEXTO LIMPIO sin emojis sin simbolos. Frases max 10 palabras. Pausas con puntos y comas. Primera persona plural. Natural y empatico.",
   "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","SuperacionPersonal","VidaSaludable","MenteClara","TerapiaOnline","SaludMentalJovenes","AnsiedadSocial","ManejoDeLaAnsiedad","SaludEmocional","PsicologiaColombia","PsicologiaMexico","SaludMentalLatam","MentePositiva","BienEstar"],
   "guion_short": "80 palabras SOLO TEXTO LIMPIO sin emojis sin simbolos. Frases max 8 palabras. Dato impactante inicio. Pregunta empatica final.",
-  "titulo_short": "titulo Short español 2 emojis max 48 caracteres sin hashtags",
+  "titulo_short": "titulo Short espaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ol 2 emojis max 48 caracteres sin hashtags",
   "comentario_ancla": "comentario empatico 2 lineas sin emojis invitando comunidad",
   "query_imagen": "query en ingles de 3 palabras para buscar imagen de fondo del thumbnail en Pexels relacionada al tema"
 }}'''
@@ -820,17 +845,17 @@ def enviar_reporte_analytics(youtube):
     try:
         if datetime.now().weekday() != 0: return
         views, watch, subs = obtener_analytics_semana(youtube)
-        msg = (f'📊 <b>Reporte Semanal SaludMentalReal</b>\n'
-               f'👁 Vistas: {views:,}\n'
-               f'⏱ Horas vistas: {watch//60:,}h\n'
-               f'👥 Suscriptores: +{subs:,}\n'
+        msg = (f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â  <b>Reporte Semanal SaludMentalReal</b>\n'
+               f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â Vistas: {views:,}\n'
+               f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â± Horas vistas: {watch//60:,}h\n'
+               f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¥ Suscriptores: +{subs:,}\n'
                f'Meta: 1,000 subs y 4,000 horas')
         send_telegram(msg)
     except Exception as e:
         print(f'Reporte error: {e}')
 
 def main():
-    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
+    send_telegram('ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â  <b>SaludMentalReal</b> ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
     print('Descargando videos Pexels...')
@@ -844,13 +869,16 @@ def main():
     musica = get_music_file()
     youtube = get_youtube()
 
-    pl_es = obtener_o_crear_playlist(youtube, PLAYLIST_ES_NAME, 'Videos psicologia y bienestar emocional en español', 'es')
+    pl_es = obtener_o_crear_playlist(youtube, PLAYLIST_ES_NAME, 'Videos psicologia y bienestar emocional en espaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ol', 'es')
     pl_en = obtener_o_crear_playlist(youtube, PLAYLIST_EN_NAME, 'Psychology and emotional wellness in English', 'en')
     pl_serie = obtener_o_crear_playlist(youtube, SERIE_ES_NAME, 'Serie 30 dias para mejorar tu salud mental', 'es')
 
     dia_serie = obtener_dia_serie()
     tema_serie = SERIE_30_DIAS[dia_serie-1]
-    tema_es = random.choice(TEMAS_ES)
+    fecha_especial = detectar_fecha_especial()
+    tema_especial = get_tema_especial(fecha_especial) if fecha_especial else None
+    tema_es = tema_especial if tema_especial else random.choice(TEMAS_ES)
+    if fecha_especial: print(f'Fecha especial detectada: {fecha_especial}')
     tema_en = random.choice(TEMAS_EN)
     print(f'ES: {tema_es} | Serie dia {dia_serie} | EN: {tema_en}')
 
@@ -906,34 +934,34 @@ def main():
     id_es = subir_youtube(youtube, v_l_es, datos_es['titulo'], datos_es['descripcion'], datos_es['tags'], thumb_es, idioma='es')
     agregar_comentario(youtube, id_es, datos_es.get('comentario_ancla', random.choice(COMENTARIOS_ES)))
     agregar_a_playlist(youtube, id_es, pl_es)
-    send_telegram(f'✅ <b>Video ES</b>\n{datos_es["titulo"]}\nhttps://youtu.be/{id_es}')
+    send_telegram(f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ <b>Video ES</b>\n{datos_es["titulo"]}\nhttps://youtu.be/{id_es}')
 
     id_s_es = subir_youtube(youtube, v_s_es, datos_es['titulo_short'], datos_es['descripcion'], datos_es['tags'], is_short=True, idioma='es')
     agregar_comentario(youtube, id_s_es, random.choice(COMENTARIOS_ES))
     agregar_a_playlist(youtube, id_s_es, pl_es)
-    send_telegram(f'✅ <b>Short ES</b>\nhttps://youtu.be/{id_s_es}')
+    send_telegram(f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ <b>Short ES</b>\nhttps://youtu.be/{id_s_es}')
 
     id_serie = subir_youtube(youtube, v_serie, datos_serie['titulo'], datos_serie['descripcion'], datos_serie['tags'], thumb_serie, idioma='es')
     agregar_comentario(youtube, id_serie, f'Este es el dia {dia_serie} de nuestra serie de 30 dias. Manana viene el siguiente. Nos vemos aqui.')
     agregar_a_playlist(youtube, id_serie, pl_serie)
     agregar_a_playlist(youtube, id_serie, pl_es)
     avanzar_dia_serie()
-    send_telegram(f'✅ <b>Serie Dia {dia_serie}</b>\n{datos_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
+    send_telegram(f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ <b>Serie Dia {dia_serie}</b>\n{datos_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
 
     id_en = subir_youtube(youtube, v_l_en, datos_en['titulo'], datos_en['descripcion'], datos_en['tags'], thumb_en, idioma='en')
     agregar_comentario(youtube, id_en, datos_en.get('comentario_ancla', random.choice(COMENTARIOS_EN)))
     agregar_a_playlist(youtube, id_en, pl_en)
-    send_telegram(f'✅ <b>Video EN</b>\n{datos_en["titulo"]}\nhttps://youtu.be/{id_en}')
+    send_telegram(f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ <b>Video EN</b>\n{datos_en["titulo"]}\nhttps://youtu.be/{id_en}')
 
     id_s_en = subir_youtube(youtube, v_s_en, datos_en['titulo_short'], datos_en['descripcion'], datos_en['tags'], is_short=True, idioma='en')
     agregar_comentario(youtube, id_s_en, random.choice(COMENTARIOS_EN))
     agregar_a_playlist(youtube, id_s_en, pl_en)
-    send_telegram(f'✅ <b>Short EN</b>\nhttps://youtu.be/{id_s_en}')
+    send_telegram(f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ <b>Short EN</b>\nhttps://youtu.be/{id_s_en}')
 
     publicar_community_post(youtube, random.choice(COMMUNITY_POSTS_ES))
     enviar_reporte_analytics(youtube)
 
-    send_telegram(f'🎉 <b>SaludMentalReal</b> — 5 videos publicados\nES: {tema_es}\nSerie dia {dia_serie}\nEN: {tema_en}')
+    send_telegram(f'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â½ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â° <b>SaludMentalReal</b> ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â 5 videos publicados\nES: {tema_es}\nSerie dia {dia_serie}\nEN: {tema_en}')
 
 if __name__ == '__main__':
     main()
