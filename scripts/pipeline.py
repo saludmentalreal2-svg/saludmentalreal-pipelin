@@ -1,7 +1,7 @@
 import os, json, pickle, random, asyncio, requests, subprocess, base64, sys, re
 from datetime import datetime, timedelta
 from groq import Groq
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.auth.transport.requests import Request
@@ -51,7 +51,57 @@ TEMAS_ES = [
     'pensamientos intrusivos que son y como manejarlos',
     'como construir rutinas que protejan tu salud mental',
     'el sueno y su rol en la ansiedad y depresion',
-    'como decirle no a personas toxicas'
+    'como decirle no a personas toxicas',
+    'por que te sientes vacio sin razon',
+    'como dejar de buscar aprobacion de los demas',
+    'señales de inmadurez emocional',
+    'como sanar relaciones toxicas',
+    'el miedo al rechazo y como vencerlo',
+    'por que te saboteas inconscientemente',
+    'duelo emocional lo que nadie te prepara para sentir',
+    'por que te cuesta pedir ayuda',
+    'como sobrevivir una crisis de ansiedad nocturna',
+    'que es la ansiedad generalizada y como tratarla',
+    'por que lloras sin razon',
+    'como dejar de compararte en redes sociales',
+    'señales de trauma emocional sin saberlo',
+    'como manejar la soledad cuando vives solo',
+    'por que sientes que no encajas en ningun lado',
+    'como recuperar la motivacion cuando todo da igual',
+    'el agotamiento emocional que nadie ve',
+    'como dejar de ser tan duro contigo mismo',
+    'por que te cuesta ser feliz aunque tengas todo',
+    'como superar el miedo al fracaso',
+    'señales de que necesitas terapia urgente',
+    'como manejar relacion con alguien deprimido',
+    'por que la ansiedad aparece de noche',
+    'como hablar de salud mental sin que te juzguen',
+    'el poder de decir no sin sentirte mal',
+    'como salir del ciclo de la negatividad',
+    'por que tienes miedo al exito',
+    'como construir autoestima desde cero',
+    'señales de que una relacion daña tu salud mental',
+    'como manejar los celos sin destruir tu relacion',
+    'por que te sientes culpable de ser feliz',
+    'como superar la traicion de alguien que amabas',
+    'el efecto del alcohol en tu salud mental',
+    'como dejar de pensar demasiado overthinking',
+    'por que evitas el conflicto aunque te lastime',
+    'señales de que eres altamente sensible',
+    'como manejar la ansiedad en el trabajo',
+    'por que te cuesta perdonar de verdad',
+    'el impacto de la familia toxica en tu salud mental',
+    'como sanar el miedo al abandono en adultos',
+    'por que te autosaboteas en el amor',
+    'señales de codependencia emocional',
+    'como meditar cuando tu mente no para',
+    'por que el ejercicio ayuda mas que un antidepresivo',
+    'como manejar la ansiedad social en eventos',
+    'por que sientes que no mereces ser amado',
+    'como salir de la depresion cuando no tienes fuerzas',
+    'el papel de la alimentacion en tu salud mental',
+    'como manejar crisis emocionales en el trabajo',
+    'por que te sientes solo rodeado de personas'
 ]
 
 SERIE_30_DIAS = [
@@ -72,7 +122,7 @@ SERIE_30_DIAS = [
     'Dia 15: como salir del ciclo de la negatividad',
     'Dia 16: el poder de escribir tus emociones',
     'Dia 17: como manejar la soledad sin que te lastime',
-    'Dia 18: aprende a pedir ayuda sin vergüenza',
+    'Dia 18: aprende a pedir ayuda sin verguenza',
     'Dia 19: como sanar tu autoestima dia a dia',
     'Dia 20: el impacto de la alimentacion en tu mente',
     'Dia 21: como manejar conflictos sin perder la calma',
@@ -123,6 +173,13 @@ QUERIES_PEXELS_V = [
     'yoga vertical wellness', 'mindfulness vertical', 'forest vertical nature',
     'ocean vertical waves', 'person thinking vertical', 'wellness vertical nature',
     'calm vertical portrait'
+]
+
+QUERIES_PEXELS_THUMB = [
+    'person meditation peaceful', 'woman thinking calm', 'man breathing nature',
+    'person nature peaceful', 'therapy calm woman', 'mindfulness person outdoor',
+    'calm person portrait', 'person yoga nature', 'emotional healing person',
+    'wellness calm portrait'
 ]
 
 COMENTARIOS_ES = [
@@ -219,27 +276,23 @@ def agregar_a_playlist(youtube, video_id, playlist_id):
             'snippet': {'playlistId': playlist_id,
                 'resourceId': {'kind': 'youtube#video', 'videoId': video_id}}
         }).execute()
-        print('Agregado a playlist OK')
+        print('Playlist OK')
     except Exception as e:
         print(f'Playlist add error: {e}')
 
 def obtener_dia_serie():
-    archivo = 'serie_dia.txt'
-    if os.path.exists(archivo):
+    if os.path.exists('serie_dia.txt'):
         try:
-            dia = int(open(archivo).read().strip())
-            return min(dia, len(SERIE_30_DIAS))
+            return min(int(open('serie_dia.txt').read().strip()), len(SERIE_30_DIAS))
         except: pass
     return 1
 
 def avanzar_dia_serie():
-    archivo = 'serie_dia.txt'
-    dia_actual = obtener_dia_serie()
-    nuevo_dia = (dia_actual % len(SERIE_30_DIAS)) + 1
-    with open(archivo, 'w') as f:
-        f.write(str(nuevo_dia))
-    print(f'Serie: dia {dia_actual} -> {nuevo_dia}')
-    return dia_actual
+    dia = obtener_dia_serie()
+    nuevo = (dia % len(SERIE_30_DIAS)) + 1
+    with open('serie_dia.txt', 'w') as f:
+        f.write(str(nuevo))
+    return dia
 
 def publicar_community_post(youtube, texto):
     try:
@@ -252,25 +305,42 @@ def publicar_community_post(youtube, texto):
 
 def obtener_analytics_semana(youtube):
     try:
-        analytics = build('youtubeAnalytics', 'v2',
-            credentials=youtube._http.credentials)
+        from googleapiclient.discovery import build as gbuild
+        analytics = gbuild('youtubeAnalytics', 'v2', credentials=youtube._http.credentials)
         hoy = datetime.now().strftime('%Y-%m-%d')
-        hace7 = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+        hace7 = (datetime.now()-timedelta(days=7)).strftime('%Y-%m-%d')
         resp = analytics.reports().query(
-            ids='channel==MINE',
-            startDate=hace7,
-            endDate=hoy,
-            metrics='views,estimatedMinutesWatched,subscribersGained',
-            dimensions='day'
+            ids='channel==MINE', startDate=hace7, endDate=hoy,
+            metrics='views,estimatedMinutesWatched,subscribersGained', dimensions='day'
         ).execute()
         rows = resp.get('rows', [])
-        total_views = sum(int(r[1]) for r in rows)
-        total_watch = sum(int(r[2]) for r in rows)
-        total_subs = sum(int(r[3]) for r in rows)
-        return total_views, total_watch, total_subs
+        return sum(int(r[1]) for r in rows), sum(int(r[2]) for r in rows), sum(int(r[3]) for r in rows)
     except Exception as e:
         print(f'Analytics error: {e}')
         return 0, 0, 0
+
+def descargar_imagen_pexels(query, w=1280, h=720):
+    headers = {'Authorization': PEXELS_API_KEY}
+    try:
+        r = requests.get('https://api.pexels.com/v1/search',
+            headers=headers,
+            params={'query': query, 'per_page': 15, 'orientation': 'landscape'},
+            timeout=20)
+        items = r.json().get('photos', [])
+        if not items: return None
+        item = random.choice(items[:10])
+        url = item['src'].get('large', item['src']['original'])
+        ir = requests.get(url, timeout=30)
+        img_path = '/tmp/thumb_bg.jpg'
+        with open(img_path, 'wb') as f:
+            f.write(ir.content)
+        img = Image.open(img_path).convert('RGB')
+        img = img.resize((w, h), Image.LANCZOS)
+        img.save(img_path, quality=95)
+        return img_path
+    except Exception as e:
+        print(f'Pexels imagen error: {e}')
+        return None
 
 def descargar_videos_pexels(queries, orientacion, n=5):
     os.makedirs('/tmp/pexels', exist_ok=True)
@@ -300,8 +370,7 @@ def descargar_videos_pexels(queries, orientacion, n=5):
                     with open(raw, 'wb') as f:
                         for chunk in vr.iter_content(chunk_size=1024*1024):
                             f.write(chunk)
-                    if not os.path.exists(raw) or os.path.getsize(raw) < 100000:
-                        continue
+                    if not os.path.exists(raw) or os.path.getsize(raw) < 100000: continue
                     proc = f'/tmp/pexels/proc_{orientacion}_{len(videos)}.mp4'
                     vf = 'scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1' if orientacion == 'landscape' else 'scale=608:1080:force_original_aspect_ratio=decrease,pad=608:1080:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1'
                     ok = run_ffmpeg(['ffmpeg','-y','-i',raw,'-vf',vf,'-t','12',
@@ -329,45 +398,44 @@ def generar_guion(tema, idioma='es', video_anterior_url=None):
     if idioma == 'es':
         prompt = f'''Eres un psicologo clinico latinoamericano con canal viral de YouTube.
 Estilo: empatico, directo, conversacional. Como un amigo que entiende tu dolor.
-CRITICO: El guion sera leido por voz sintetica. CERO emojis, asteriscos, hashtags o simbolos en guion y guion_short.
-Solo texto limpio con puntos y comas para pausas naturales.
+CRITICO: El guion sera leido por voz sintetica. CERO emojis, asteriscos, hashtags o simbolos especiales en guion y guion_short. Solo texto limpio.
 
 Estructura guion 5 partes:
 1. GANCHO: pregunta o dato impactante menos 12 palabras
 2. VALIDACION: sus sentimientos son validos, no estan solos
 3. EXPLICACION: problema en terminos simples con ejemplos cotidianos
 4. SOLUCION: 3 pasos concretos aplicables hoy
-5. CIERRE: esperanza real, menciona {link_anterior} si existe, invita a suscribirse y comentar
+5. CIERRE: esperanza real, {link_anterior}, invita suscribirse y comentar
 
 Tema: {tema}
 
 JSON puro sin markdown:
 {{
   "titulo": "titulo viral español 2 emojis inicio, numero o pregunta impactante, max 68 caracteres, sin hashtags",
-  "descripcion": "500 palabras: primera linea pregunta engancha, segunda linea suscribirse y campana, parrafos con emojis, CAPITULOS YouTube con timestamps exactos: 0:00 Introduccion, 0:45 El problema real, 1:30 Por que te sucede esto, 2:45 3 soluciones que funcionan, 4:00 Mensaje de esperanza, parrafo recursos crisis con numeros reales de lineas de ayuda LATAM, {link_anterior}, 25 hashtags: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness #CrecimientoPersonal #TerapiaOnline #SaludMentalMexico #SaludMentalColombia #PsicologiaPositiva #MenteClara #SaludMentalJovenes #AnsiedadSocial #VidaSaludable #SuperacionPersonal #SaludMentalLatam #PsicologiaColombia #PsicologiaMexico #MentePositiva #BienEstar",
+  "descripcion": "500 palabras: primera linea pregunta engancha, segunda linea suscribirse y campana, parrafos con emojis relevantes, CAPITULOS: 0:00 Introduccion | 0:45 El problema real | 1:30 Por que te sucede | 2:45 3 soluciones que funcionan | 4:00 Mensaje de esperanza, recursos crisis LATAM con numeros reales, {link_anterior}, 25 hashtags: #SaludMental #Ansiedad #Depresion #BienestarEmocional #PsicologiaLatina #MenteLibre #SaludMentalReal #Autoestima #Motivacion #Mindfulness #CrecimientoPersonal #TerapiaOnline #SaludMentalMexico #SaludMentalColombia #PsicologiaPositiva #MenteClara #SaludMentalJovenes #AnsiedadSocial #VidaSaludable #SuperacionPersonal #SaludMentalLatam #PsicologiaColombia #PsicologiaMexico #MentePositiva #BienEstar",
   "guion": "520 palabras SOLO TEXTO LIMPIO sin emojis sin simbolos. Frases max 10 palabras. Pausas con puntos y comas. Primera persona plural. Natural y empatico.",
   "tags": ["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","Autoestima","Mindfulness","SaludMentalReal","MotivacionDiaria","CrecimientoPersonal","PsicologiaPositiva","SuperacionPersonal","VidaSaludable","MenteClara","TerapiaOnline","SaludMentalJovenes","AnsiedadSocial","ManejoDeLaAnsiedad","SaludEmocional","PsicologiaColombia","PsicologiaMexico","SaludMentalLatam","MentePositiva","BienEstar"],
   "guion_short": "80 palabras SOLO TEXTO LIMPIO sin emojis sin simbolos. Frases max 8 palabras. Dato impactante inicio. Pregunta empatica final.",
   "titulo_short": "titulo Short español 2 emojis max 48 caracteres sin hashtags",
-  "comentario_ancla": "comentario empatico 2 lineas sin emojis invitando comunidad"
+  "comentario_ancla": "comentario empatico 2 lineas sin emojis invitando comunidad",
+  "query_imagen": "query en ingles de 3 palabras para buscar imagen de fondo del thumbnail en Pexels relacionada al tema"
 }}'''
     else:
         prompt = f'''You are a clinical psychologist with a viral YouTube channel.
-Style: empathetic, direct, conversational. Like a friend who truly understands.
-CRITICAL: Script will be read by synthetic voice. ZERO emojis, asterisks, hashtags in guion/guion_short.
-Clean text only with periods and commas.
+Style: empathetic, direct, conversational. CRITICAL: ZERO emojis in guion/guion_short.
 
 Topic: {tema}
 
-Pure JSON no markdown:
+Pure JSON:
 {{
   "titulo": "viral English title 2 emojis start, number or question, max 68 chars, no hashtags",
-  "descripcion": "400 words: engaging question, subscribe line, emoji paragraphs, YOUTUBE CHAPTERS: 0:00 Introduction, 0:45 The real problem, 1:30 Why this happens, 2:45 Three solutions, 4:00 Message of hope, crisis resources paragraph with real helpline numbers, {link_anterior}, 20 hashtags",
-  "guion": "450 words CLEAN TEXT ONLY no emojis no symbols. Max 10 words per sentence. Natural empathetic. First person plural.",
+  "descripcion": "400 words: engaging question, subscribe line, emoji paragraphs, CHAPTERS: 0:00 Introduction | 0:45 The problem | 1:30 Why it happens | 2:45 Three solutions | 4:00 Hope message, crisis helplines, {link_anterior}, 20 hashtags",
+  "guion": "450 words CLEAN TEXT ONLY no emojis. Max 10 words per sentence. Natural empathetic.",
   "tags": ["MentalHealth","Anxiety","Depression","EmotionalWellness","Psychology","MindOverMatter","MentalHealthMatters","SelfCare","Motivation","Mindfulness","PersonalGrowth","Therapy","MentalHealthAwareness","AnxietyRelief","HealingJourney","EmotionalHealth","MentalWellness","SelfLove","Mindset","PositivePsychology"],
-  "guion_short": "70 words CLEAN TEXT ONLY no emojis no symbols. Max 8 words per sentence. Impactful opening. Empathetic question end.",
+  "guion_short": "70 words CLEAN TEXT ONLY no emojis. Max 8 words per sentence. Impactful opening. Empathetic question end.",
   "titulo_short": "English Short title 2 emojis max 48 chars no hashtags",
-  "comentario_ancla": "empathetic 2 line comment no emojis inviting community"
+  "comentario_ancla": "empathetic 2 line comment no emojis",
+  "query_imagen": "3 word English query for Pexels background image related to topic"
 }}'''
     resp = client.chat.completions.create(
         model='llama-3.3-70b-versatile',
@@ -436,133 +504,168 @@ def mezclar_audio(voz_mp3, musica, salida, vol=0.08):
         '-map','[out]','-c:a','aac','-b:a','128k','-ar','44100',salida
     ], 'mezcla')
     if not ok or not os.path.exists(salida) or os.path.getsize(salida) < 1000:
-        shutil.copy(voz_mp3, salida)
+        import shutil; shutil.copy(voz_mp3, salida)
         print('Mezcla fallida - solo voz')
 
-def crear_pantalla_final(video_siguiente_titulo, output, w=1280, h=720, dur=5):
-    paleta = random.choice(PALETAS)
-    img = Image.new('RGB', (w,h), color=paleta['fondo'])
+def crear_thumbnail_profesional(titulo, archivo, query_imagen=None, paleta=None):
+    if not paleta: paleta = random.choice(PALETAS)
+    W, H = 1280, 720
+
+    # Intentar obtener imagen de fondo de Pexels
+    bg_path = None
+    if query_imagen:
+        bg_path = descargar_imagen_pexels(query_imagen, W, H)
+    if not bg_path:
+        bg_path = descargar_imagen_pexels(random.choice(QUERIES_PEXELS_THUMB), W, H)
+
+    if bg_path and os.path.exists(bg_path):
+        img = Image.open(bg_path).convert('RGB')
+        img = img.resize((W, H), Image.LANCZOS)
+        # Oscurecer la imagen para que el texto se lea bien
+        enhancer = ImageEnhance.Brightness(img)
+        img = enhancer.enhance(0.35)
+        # Blur suave
+        img = img.filter(ImageFilter.GaussianBlur(radius=2))
+    else:
+        img = Image.new('RGB', (W,H), color=paleta['fondo'])
+        draw_tmp = ImageDraw.Draw(img)
+        for i in range(H):
+            factor = i/H
+            r = min(255, paleta['fondo'][0]+int(factor*35))
+            g = min(255, paleta['fondo'][1]+int(factor*25))
+            b = min(255, paleta['fondo'][2]+int(factor*45))
+            draw_tmp.line([(0,i),(W,i)], fill=(r,g,b))
+
     draw = ImageDraw.Draw(img)
-    for i in range(h):
-        factor = i/h
-        r = min(255, paleta['fondo'][0]+int(factor*35))
-        g = min(255, paleta['fondo'][1]+int(factor*25))
-        b = min(255, paleta['fondo'][2]+int(factor*45))
-        draw.line([(0,i),(w,i)], fill=(r,g,b))
-    draw.rectangle([0,0,w,6], fill=paleta['acento'])
-    draw.rectangle([0,h-6,w,h], fill=paleta['acento'])
+
+    # Overlay degradado inferior para legibilidad
+    overlay = Image.new('RGBA', (W, H), (0,0,0,0))
+    draw_ov = ImageDraw.Draw(overlay)
+    for i in range(H):
+        alpha = int(180 * (i/H)**0.7)
+        draw_ov.line([(0,i),(W,i)], fill=(0,0,0,alpha))
+    img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
+    draw = ImageDraw.Draw(img)
+
+    # Barra de acento superior
+    draw.rectangle([0,0,W,8], fill=paleta['acento'])
+    # Barra inferior
+    draw.rectangle([0,H-80,W,H], fill=(0,0,0))
+    draw.rectangle([0,H-8,W,H], fill=paleta['acento'])
+
     try:
-        font_big = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 52 if w==1280 else 36)
-        font_med = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 36 if w==1280 else 24)
-        font_small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 26 if w==1280 else 18)
+        font_big = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 80)
+        font_med = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 34)
+        font_small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 26)
     except:
         font_big = ImageFont.load_default()
         font_med = font_big
         font_small = font_big
-    # Texto superior
-    txt1 = 'SUSCRIBETE PARA MAS'
-    try: tw1 = draw.textbbox((0,0),txt1,font=font_med)[2]
-    except: tw1 = 400
-    draw.text(((w-tw1)//2+2,h//4+2),txt1,font=font_med,fill=(0,0,0))
-    draw.text(((w-tw1)//2,h//4),txt1,font=font_med,fill=paleta['acento'])
-    # Canal
-    try: tw2 = draw.textbbox((0,0),CHANNEL_HANDLE,font=font_big)[2]
-    except: tw2 = 400
-    draw.text(((w-tw2)//2+3,h//2-20+3),CHANNEL_HANDLE,font=font_big,fill=(0,0,0))
-    draw.text(((w-tw2)//2,h//2-20),CHANNEL_HANDLE,font=font_big,fill=paleta['texto'])
-    # Siguiente video
-    txt3 = 'SIGUIENTE VIDEO:'
-    try: tw3 = draw.textbbox((0,0),txt3,font=font_small)[2]
-    except: tw3 = 300
-    draw.text(((w-tw3)//2,h*3//4-30),txt3,font=font_small,fill=paleta['acento'])
-    sig_limpio = re.sub(r'[^\w\s\?!.,]','',video_siguiente_titulo)[:50].upper()
-    try: tw4 = draw.textbbox((0,0),sig_limpio,font=font_small)[2]
-    except: tw4 = 300
-    draw.text(((w-tw4)//2,h*3//4),sig_limpio,font=font_small,fill=paleta['texto'])
-    img_path = output.replace('.mp4','_frame.jpg')
-    img.save(img_path, quality=95)
-    run_ffmpeg(['ffmpeg','-y','-loop','1','-i',img_path,
-        '-t',str(dur),'-c:v','libx264','-pix_fmt','yuv420p','-r','25','-an',output],'pantalla_final')
 
-def agregar_marca_agua(video_in, video_out, w=1280, h=720):
-    try:
-        font_size = 28 if w == 1280 else 20
-        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', font_size)
-    except:
-        font = ImageFont.load_default()
-    img = Image.new('RGBA', (w,50), (0,0,0,0))
-    draw = ImageDraw.Draw(img)
-    try:
-        bbox = draw.textbbox((0,0),CHANNEL_HANDLE,font=font)
-        tw = bbox[2]-bbox[0]
-    except:
-        tw = len(CHANNEL_HANDLE)*14
-    x = (w-tw)//2
-    draw.text((x+2,10),CHANNEL_HANDLE,font=font,fill=(0,0,0,160))
-    draw.text((x,8),CHANNEL_HANDLE,font=font,fill=(255,255,255,210))
-    marca_path = '/tmp/marca_agua.png'
-    img.save(marca_path)
-    ok = run_ffmpeg([
-        'ffmpeg','-y','-i',video_in,'-i',marca_path,
-        '-filter_complex',f'[1:v]scale={w}:50[wm];[0:v][wm]overlay=(W-w)/2:8',
-        '-c:v','libx264','-pix_fmt','yuv420p','-preset','fast',video_out
-    ], 'marca_agua')
-    return ok and os.path.exists(video_out) and os.path.getsize(video_out) > 10000
-
-def crear_thumbnail(titulo, archivo, paleta=None):
-    if not paleta: paleta = random.choice(PALETAS)
-    W, H = 1280, 720
-    img = Image.new('RGB', (W,H), color=paleta['fondo'])
-    draw = ImageDraw.Draw(img)
-    for i in range(H):
-        factor = i/H
-        r = min(255, paleta['fondo'][0]+int(factor*35))
-        g = min(255, paleta['fondo'][1]+int(factor*25))
-        b = min(255, paleta['fondo'][2]+int(factor*45))
-        draw.line([(0,i),(W,i)], fill=(r,g,b))
-    for i in range(0,W,45):
-        draw.line([(i,0),(i,H)],fill=(min(255,paleta['fondo'][0]+12),min(255,paleta['fondo'][1]+8),min(255,paleta['fondo'][2]+18)),width=1)
-    for i in range(0,H,45):
-        draw.line([(0,i),(W,i)],fill=(min(255,paleta['fondo'][0]+12),min(255,paleta['fondo'][1]+8),min(255,paleta['fondo'][2]+18)),width=1)
-    draw.rectangle([0,0,W,6],fill=paleta['acento'])
-    draw.rectangle([0,H-6,W,H],fill=paleta['acento'])
-    draw.rectangle([0,0,6,H],fill=paleta['acento'])
-    draw.rectangle([W-6,0,W,H],fill=paleta['acento'])
-    draw.rectangle([50,85,W-50,H-65],fill=(0,0,0))
-    draw.rectangle([53,88,W-53,H-68],fill=(max(0,paleta['fondo'][0]-5),max(0,paleta['fondo'][1]-5),max(0,paleta['fondo'][2]-5)))
-    draw.rectangle([50,85,W-50,91],fill=paleta['acento'])
-    try:
-        font_big = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 76)
-        font_med = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 34)
-    except:
-        font_big = ImageFont.load_default()
-        font_med = font_big
     titulo_limpio = re.sub(r'[^\w\s\?!.,]','',titulo).strip()
     palabras = titulo_limpio.upper().split()
     lineas, linea = [], ''
     for p in palabras:
         test = (linea+' '+p).strip()
         try:
-            if draw.textbbox((0,0),test,font=font_big)[2] < W-140: linea=test
+            if draw.textbbox((0,0),test,font=font_big)[2] < W-80: linea=test
             else:
                 if linea: lineas.append(linea)
                 linea=p
         except: linea=test
     if linea: lineas.append(linea)
-    total_h = len(lineas)*88
-    y = (H-total_h)//2-20
+
+    total_h = len(lineas)*90
+    y = (H-80-total_h)//2 + 20
+
     for ln in lineas:
         try: tw=draw.textbbox((0,0),ln,font=font_big)[2]
-        except: tw=len(ln)*38
-        for dx,dy in [(4,4),(3,3)]:
+        except: tw=len(ln)*40
+        # Sombra fuerte
+        for dx,dy in [(4,4),(3,3),(5,5),(-2,2)]:
             draw.text(((W-tw)//2+dx,y+dy),ln,font=font_big,fill=(0,0,0))
-        draw.text(((W-tw)//2,y),ln,font=font_big,fill=paleta['texto'])
-        y += 88
-    draw.rectangle([90,H-60,W-90,H-55],fill=paleta['acento'])
+        draw.text(((W-tw)//2,y),ln,font=font_big,fill=(255,255,255))
+        y += 90
+
+    # Linea de acento debajo del titulo
+    draw.rectangle([W//4, y+5, W*3//4, y+9], fill=paleta['acento'])
+
+    # Canal en barra inferior
     try: tw2=draw.textbbox((0,0),CHANNEL_HANDLE,font=font_med)[2]
     except: tw2=300
-    draw.text(((W-tw2)//2,H-52),CHANNEL_HANDLE,font=font_med,fill=paleta['acento'])
+    draw.text(((W-tw2)//2, H-62), CHANNEL_HANDLE, font=font_med, fill=paleta['acento'])
+
     img.save(archivo, quality=95)
+    print(f'Thumbnail profesional OK')
+
+def agregar_texto_short(video_in, titulo_short, video_out, w=608, h=1080):
+    titulo_limpio = re.sub(r'[^\w\s\?!.,]','',titulo_short).strip()
+    palabras = titulo_limpio.upper().split()
+    lineas, linea = [], ''
+
+    img_test = Image.new('RGB', (w,50))
+    draw_test = ImageDraw.Draw(img_test)
+    try:
+        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 42)
+    except:
+        font = ImageFont.load_default()
+
+    for p in palabras:
+        test = (linea+' '+p).strip()
+        try:
+            if draw_test.textbbox((0,0),test,font=font)[2] < w-40: linea=test
+            else:
+                if linea: lineas.append(linea)
+                linea=p
+        except: linea=test
+    if linea: lineas.append(linea)
+
+    texto_drawtext = []
+    y_start = 80
+    paleta = random.choice(PALETAS)
+    r,g,b = paleta['acento']
+    color_hex = f'#{r:02x}{g:02x}{b:02x}'
+
+    for i, ln in enumerate(lineas):
+        y = y_start + i*55
+        texto_drawtext.append(
+            f"drawtext=text='{ln}':fontsize=42:fontcolor=white:x=(w-text_w)/2:y={y}:shadowcolor=black:shadowx=3:shadowy=3:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        )
+
+    if texto_drawtext:
+        filtro = ','.join(texto_drawtext)
+        ok = run_ffmpeg([
+            'ffmpeg','-y','-i',video_in,
+            '-vf', filtro,
+            '-c:v','libx264','-pix_fmt','yuv420p','-preset','fast',video_out
+        ], 'texto_short')
+        return ok and os.path.exists(video_out) and os.path.getsize(video_out) > 10000
+    return False
+
+def agregar_marca_agua(video_in, video_out, w=1280, h=720):
+    try:
+        font_size = 26 if w == 1280 else 18
+        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', font_size)
+    except:
+        font = ImageFont.load_default()
+    img = Image.new('RGBA', (w,45), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+    try:
+        bbox = draw.textbbox((0,0),CHANNEL_HANDLE,font=font)
+        tw = bbox[2]-bbox[0]
+    except:
+        tw = len(CHANNEL_HANDLE)*13
+    x = (w-tw)//2
+    draw.text((x+2,10),CHANNEL_HANDLE,font=font,fill=(0,0,0,150))
+    draw.text((x,8),CHANNEL_HANDLE,font=font,fill=(255,255,255,200))
+    marca_path = '/tmp/marca_agua.png'
+    img.save(marca_path)
+    ok = run_ffmpeg([
+        'ffmpeg','-y','-i',video_in,'-i',marca_path,
+        '-filter_complex',f'[1:v]scale={w}:45[wm];[0:v][wm]overlay=(W-w)/2:8',
+        '-c:v','libx264','-pix_fmt','yuv420p','-preset','fast',video_out
+    ], 'marca_agua')
+    return ok and os.path.exists(video_out) and os.path.getsize(video_out) > 10000
 
 def agregar_subtitulos(video_in, srt_file, video_out, fontsize=20, margenv=40):
     if not srt_file or not os.path.exists(srt_file) or os.path.getsize(srt_file)<10:
@@ -577,9 +680,53 @@ def agregar_subtitulos(video_in, srt_file, video_out, fontsize=20, margenv=40):
     ], 'subs')
     return ok and os.path.exists(video_out) and os.path.getsize(video_out)>10000
 
-def crear_video(audio_file, srt_file, videos, output_file, titulo_siguiente='', w=1280, h=720, is_short=False):
+def crear_pantalla_final(titulo_siguiente, output, w=1280, h=720, dur=5):
+    paleta = random.choice(PALETAS)
+    bg = descargar_imagen_pexels('peaceful nature calm', w, h)
+    if bg and os.path.exists(bg):
+        img = Image.open(bg).convert('RGB').resize((w,h), Image.LANCZOS)
+        enhancer = ImageEnhance.Brightness(img)
+        img = enhancer.enhance(0.25)
+    else:
+        img = Image.new('RGB',(w,h),color=paleta['fondo'])
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([0,0,w,6], fill=paleta['acento'])
+    draw.rectangle([0,h-6,w,h], fill=paleta['acento'])
+    try:
+        font_big = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 52)
+        font_med = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 36)
+        font_small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 26)
+    except:
+        font_big = ImageFont.load_default(); font_med = font_big; font_small = font_big
+
+    txt1 = 'SUSCRIBETE PARA MAS CONTENIDO'
+    try: tw1=draw.textbbox((0,0),txt1,font=font_small)[2]
+    except: tw1=500
+    draw.text(((w-tw1)//2,h//5),txt1,font=font_small,fill=paleta['acento'])
+
+    try: tw2=draw.textbbox((0,0),CHANNEL_HANDLE,font=font_big)[2]
+    except: tw2=400
+    draw.text(((w-tw2)//2+3,h//2-30+3),CHANNEL_HANDLE,font=font_big,fill=(0,0,0))
+    draw.text(((w-tw2)//2,h//2-30),CHANNEL_HANDLE,font=font_big,fill=(255,255,255))
+
+    txt3 = 'SIGUIENTE VIDEO:'
+    try: tw3=draw.textbbox((0,0),txt3,font=font_small)[2]
+    except: tw3=300
+    draw.text(((w-tw3)//2,h*3//4-30),txt3,font=font_small,fill=paleta['acento'])
+
+    sig = re.sub(r'[^\w\s\?!.,]','',titulo_siguiente)[:50].upper()
+    try: tw4=draw.textbbox((0,0),sig,font=font_small)[2]
+    except: tw4=300
+    draw.text(((w-tw4)//2,h*3//4),sig,font=font_small,fill=(255,255,255))
+
+    img_path = output.replace('.mp4','_frame.jpg')
+    img.save(img_path, quality=95)
+    run_ffmpeg(['ffmpeg','-y','-loop','1','-i',img_path,'-t',str(dur),
+        '-c:v','libx264','-pix_fmt','yuv420p','-r','25','-an',output],'pantalla_final')
+
+def crear_video(audio_file, srt_file, videos, output_file, titulo_siguiente='', titulo_short='', w=1280, h=720, is_short=False):
     duracion = get_audio_duration(audio_file)
-    print(f'Creando video {w}x{h} | {duracion:.1f}s')
+    print(f'Video {w}x{h} | {duracion:.1f}s')
     dur_clip = 9
     n_clips = max(3, int(duracion/dur_clip)+3)
     clips = []
@@ -594,30 +741,42 @@ def crear_video(audio_file, srt_file, videos, output_file, titulo_siguiente='', 
             clips.append(clip)
     if not clips:
         print('ERROR: Sin clips'); sys.exit(1)
-    # Pantalla final solo para videos largos
+
     if not is_short and titulo_siguiente:
-        pantalla = f'/tmp/pantalla_final_{w}.mp4'
+        pantalla = f'/tmp/pantalla_{w}.mp4'
         crear_pantalla_final(titulo_siguiente, pantalla, w, h, 5)
-        if os.path.exists(pantalla) and os.path.getsize(pantalla) > 1000:
+        if os.path.exists(pantalla) and os.path.getsize(pantalla)>1000:
             clips.append(pantalla)
+
     lista = f'/tmp/lista_{w}.txt'
     with open(lista,'w') as f:
         for c in clips: f.write(f"file '{c}'\n")
     video_mudo = f'/tmp/mudo_{w}.mp4'
     run_ffmpeg(['ffmpeg','-y','-f','concat','-safe','0','-i',lista,
         '-c:v','libx264','-pix_fmt','yuv420p',video_mudo],'concat')
+
+    # Subtitulos
     video_subs = f'/tmp/subs_{w}.mp4'
     subs_ok = agregar_subtitulos(video_mudo, srt_file, video_subs,
         18 if not is_short else 16, 40 if not is_short else 55)
     video_base = video_subs if subs_ok else video_mudo
+
+    # Texto hook en shorts
+    if is_short and titulo_short:
+        video_hook = f'/tmp/hook_{w}.mp4'
+        hook_ok = agregar_texto_short(video_base, titulo_short, video_hook, w, h)
+        if hook_ok: video_base = video_hook
+
+    # Marca de agua
     video_marca = f'/tmp/marca_{w}.mp4'
     marca_ok = agregar_marca_agua(video_base, video_marca, w, h)
     video_final = video_marca if marca_ok else video_base
+
     run_ffmpeg(['ffmpeg','-y','-i',video_final,'-i',audio_file,
         '-map','0:v','-map','1:a','-c:v','copy','-c:a','aac',
         '-b:a','192k' if not is_short else '128k','-shortest',output_file],'final')
     size = os.path.getsize(output_file) if os.path.exists(output_file) else 0
-    print(f'Video OK: {size//1024}KB | subs:{"si" if subs_ok else "no"} | marca:{"si" if marca_ok else "no"}')
+    print(f'OK: {size//1024}KB | subs:{"si" if subs_ok else "no"} | marca:{"si" if marca_ok else "no"}')
 
 def subir_youtube(youtube, video_file, titulo, descripcion, tags, thumbnail=None, is_short=False, idioma='es'):
     if not os.path.exists(video_file) or os.path.getsize(video_file)<10000:
@@ -659,20 +818,14 @@ def agregar_comentario(youtube, video_id, comentario):
 
 def enviar_reporte_analytics(youtube):
     try:
-        hoy = datetime.now()
-        if hoy.weekday() != 0:
-            return
+        if datetime.now().weekday() != 0: return
         views, watch, subs = obtener_analytics_semana(youtube)
-        horas = watch // 60
         msg = (f'📊 <b>Reporte Semanal SaludMentalReal</b>\n'
-               f'Semana: {(hoy-timedelta(days=7)).strftime("%d/%m")} - {hoy.strftime("%d/%m/%Y")}\n\n'
                f'👁 Vistas: {views:,}\n'
-               f'⏱ Horas vistas: {horas:,}h\n'
-               f'👥 Suscriptores ganados: {subs:,}\n\n'
-               f'Meta monetizacion:\n'
-               f'1,000 suscriptores y 4,000 horas de reproduccion')
+               f'⏱ Horas vistas: {watch//60:,}h\n'
+               f'👥 Suscriptores: +{subs:,}\n'
+               f'Meta: 1,000 subs y 4,000 horas')
         send_telegram(msg)
-        print('Reporte analytics enviado')
     except Exception as e:
         print(f'Reporte error: {e}')
 
@@ -691,127 +844,96 @@ def main():
     musica = get_music_file()
     youtube = get_youtube()
 
-    # Playlists
-    pl_es = obtener_o_crear_playlist(youtube, PLAYLIST_ES_NAME,
-        'Videos de psicologia y bienestar emocional en español latino', 'es')
-    pl_en = obtener_o_crear_playlist(youtube, PLAYLIST_EN_NAME,
-        'Psychology and emotional wellness videos in English', 'en')
-    pl_serie = obtener_o_crear_playlist(youtube, SERIE_ES_NAME,
-        'Serie completa de 30 dias para mejorar tu salud mental paso a paso', 'es')
+    pl_es = obtener_o_crear_playlist(youtube, PLAYLIST_ES_NAME, 'Videos psicologia y bienestar emocional en español', 'es')
+    pl_en = obtener_o_crear_playlist(youtube, PLAYLIST_EN_NAME, 'Psychology and emotional wellness in English', 'en')
+    pl_serie = obtener_o_crear_playlist(youtube, SERIE_ES_NAME, 'Serie 30 dias para mejorar tu salud mental', 'es')
 
-    # Serie 30 dias
     dia_serie = obtener_dia_serie()
     tema_serie = SERIE_30_DIAS[dia_serie-1]
-    print(f'Serie dia {dia_serie}: {tema_serie}')
-
-    # Temas regulares
     tema_es = random.choice(TEMAS_ES)
     tema_en = random.choice(TEMAS_EN)
-    print(f'Tema ES: {tema_es}')
-    print(f'Tema EN: {tema_en}')
+    print(f'ES: {tema_es} | Serie dia {dia_serie} | EN: {tema_en}')
 
-    # Generar guiones
     datos_es = generar_guion(tema_es, 'es')
     datos_serie = generar_guion(tema_serie, 'es')
     datos_en = generar_guion(tema_en, 'en')
 
-    # TTS todos
-    audio_es = '/tmp/smr/audio_es.mp3'; srt_es = '/tmp/subs_es.srt'
+    # TTS
+    audio_es='/tmp/smr/audio_es.mp3'; srt_es='/tmp/subs_es.srt'
     asyncio.run(tts_con_srt(datos_es['guion'], audio_es, srt_es, VOZ_ES))
-
-    audio_es_short = '/tmp/smr/audio_es_short.mp3'; srt_es_short = '/tmp/subs_es_short.srt'
-    asyncio.run(tts_con_srt(datos_es['guion_short'], audio_es_short, srt_es_short, VOZ_ES))
-
-    audio_serie = '/tmp/smr/audio_serie.mp3'; srt_serie = '/tmp/subs_serie.srt'
+    audio_es_s='/tmp/smr/audio_es_s.mp3'; srt_es_s='/tmp/subs_es_s.srt'
+    asyncio.run(tts_con_srt(datos_es['guion_short'], audio_es_s, srt_es_s, VOZ_ES))
+    audio_serie='/tmp/smr/audio_serie.mp3'; srt_serie='/tmp/subs_serie.srt'
     asyncio.run(tts_con_srt(datos_serie['guion'], audio_serie, srt_serie, VOZ_ES))
-
-    audio_en = '/tmp/smr/audio_en.mp3'; srt_en = '/tmp/subs_en.srt'
+    audio_en='/tmp/smr/audio_en.mp3'; srt_en='/tmp/subs_en.srt'
     asyncio.run(tts_con_srt(datos_en['guion'], audio_en, srt_en, VOZ_EN))
+    audio_en_s='/tmp/smr/audio_en_s.mp3'; srt_en_s='/tmp/subs_en_s.srt'
+    asyncio.run(tts_con_srt(datos_en['guion_short'], audio_en_s, srt_en_s, VOZ_EN))
 
-    audio_en_short = '/tmp/smr/audio_en_short.mp3'; srt_en_short = '/tmp/subs_en_short.srt'
-    asyncio.run(tts_con_srt(datos_en['guion_short'], audio_en_short, srt_en_short, VOZ_EN))
-
-    # Mezcla audio
     def mix(voz, salida):
         if musica: mezclar_audio(voz, musica, salida)
         else:
             import shutil; shutil.copy(voz, salida)
 
-    largo_es='/tmp/smr/largo_es.mp3'; short_es_a='/tmp/smr/short_es.mp3'
-    largo_serie='/tmp/smr/largo_serie.mp3'
-    largo_en='/tmp/smr/largo_en.mp3'; short_en_a='/tmp/smr/short_en.mp3'
-    mix(audio_es, largo_es); mix(audio_es_short, short_es_a)
-    mix(audio_serie, largo_serie)
-    mix(audio_en, largo_en); mix(audio_en_short, short_en_a)
+    l_es='/tmp/smr/l_es.mp3'; s_es='/tmp/smr/s_es.mp3'
+    l_serie='/tmp/smr/l_serie.mp3'
+    l_en='/tmp/smr/l_en.mp3'; s_en='/tmp/smr/s_en.mp3'
+    mix(audio_es,l_es); mix(audio_es_s,s_es)
+    mix(audio_serie,l_serie)
+    mix(audio_en,l_en); mix(audio_en_s,s_en)
 
-    # Thumbnails
-    thumb_es='/tmp/smr/thumb_es.jpg'; thumb_serie='/tmp/smr/thumb_serie.jpg'; thumb_en='/tmp/smr/thumb_en.jpg'
-    crear_thumbnail(datos_es['titulo'], thumb_es)
-    crear_thumbnail(datos_serie['titulo'], thumb_serie)
-    crear_thumbnail(datos_en['titulo'], thumb_en)
+    # Thumbnails profesionales con imagen real
+    thumb_es='/tmp/smr/thumb_es.jpg'
+    thumb_serie='/tmp/smr/thumb_serie.jpg'
+    thumb_en='/tmp/smr/thumb_en.jpg'
+    crear_thumbnail_profesional(datos_es['titulo'], thumb_es, datos_es.get('query_imagen'))
+    crear_thumbnail_profesional(datos_serie['titulo'], thumb_serie, datos_serie.get('query_imagen'))
+    crear_thumbnail_profesional(datos_en['titulo'], thumb_en, datos_en.get('query_imagen'))
 
-    # Crear videos
-    vid_largo_es='/tmp/smr/video_largo_es.mp4'
-    crear_video(largo_es, srt_es, videos_h, vid_largo_es, datos_serie['titulo'], 1280, 720)
+    # Videos
+    v_l_es='/tmp/smr/v_l_es.mp4'
+    crear_video(l_es, srt_es, videos_h, v_l_es, datos_serie['titulo'], '', 1280, 720)
+    v_s_es='/tmp/smr/v_s_es.mp4'
+    crear_video(s_es, srt_es_s, videos_v, v_s_es, '', datos_es['titulo_short'], 608, 1080, True)
+    v_serie='/tmp/smr/v_serie.mp4'
+    crear_video(l_serie, srt_serie, videos_h, v_serie, datos_en['titulo'], '', 1280, 720)
+    v_l_en='/tmp/smr/v_l_en.mp4'
+    crear_video(l_en, srt_en, videos_h, v_l_en, datos_es['titulo'], '', 1280, 720)
+    v_s_en='/tmp/smr/v_s_en.mp4'
+    crear_video(s_en, srt_en_s, videos_v, v_s_en, '', datos_en['titulo_short'], 608, 1080, True)
 
-    vid_short_es='/tmp/smr/video_short_es.mp4'
-    crear_video(short_es_a, srt_es_short, videos_v, vid_short_es, '', 608, 1080, True)
-
-    vid_serie='/tmp/smr/video_serie.mp4'
-    crear_video(largo_serie, srt_serie, videos_h, vid_serie, datos_en['titulo'], 1280, 720)
-
-    vid_largo_en='/tmp/smr/video_largo_en.mp4'
-    crear_video(largo_en, srt_en, videos_h, vid_largo_en, datos_es['titulo'], 1280, 720)
-
-    vid_short_en='/tmp/smr/video_short_en.mp4'
-    crear_video(short_en_a, srt_en_short, videos_v, vid_short_en, '', 608, 1080, True)
-
-    # Subir video largo ES
-    id_es = subir_youtube(youtube, vid_largo_es, datos_es['titulo'],
-        datos_es['descripcion'], datos_es['tags'], thumb_es, idioma='es')
+    # Subir
+    id_es = subir_youtube(youtube, v_l_es, datos_es['titulo'], datos_es['descripcion'], datos_es['tags'], thumb_es, idioma='es')
     agregar_comentario(youtube, id_es, datos_es.get('comentario_ancla', random.choice(COMENTARIOS_ES)))
     agregar_a_playlist(youtube, id_es, pl_es)
     send_telegram(f'✅ <b>Video ES</b>\n{datos_es["titulo"]}\nhttps://youtu.be/{id_es}')
-    url_es = f'https://youtu.be/{id_es}'
 
-    # Subir short ES
-    id_short_es = subir_youtube(youtube, vid_short_es, datos_es['titulo_short'],
-        datos_es['descripcion'], datos_es['tags'], is_short=True, idioma='es')
-    agregar_comentario(youtube, id_short_es, random.choice(COMENTARIOS_ES))
-    agregar_a_playlist(youtube, id_short_es, pl_es)
-    send_telegram(f'✅ <b>Short ES</b>\nhttps://youtu.be/{id_short_es}')
+    id_s_es = subir_youtube(youtube, v_s_es, datos_es['titulo_short'], datos_es['descripcion'], datos_es['tags'], is_short=True, idioma='es')
+    agregar_comentario(youtube, id_s_es, random.choice(COMENTARIOS_ES))
+    agregar_a_playlist(youtube, id_s_es, pl_es)
+    send_telegram(f'✅ <b>Short ES</b>\nhttps://youtu.be/{id_s_es}')
 
-    # Subir serie 30 dias
-    id_serie = subir_youtube(youtube, vid_serie, datos_serie['titulo'],
-        datos_serie['descripcion'], datos_serie['tags'], thumb_serie, idioma='es')
-    agregar_comentario(youtube, id_serie, f'Este es el {tema_serie}. Mañana viene el siguiente dia. Nos vemos aqui.')
+    id_serie = subir_youtube(youtube, v_serie, datos_serie['titulo'], datos_serie['descripcion'], datos_serie['tags'], thumb_serie, idioma='es')
+    agregar_comentario(youtube, id_serie, f'Este es el dia {dia_serie} de nuestra serie de 30 dias. Manana viene el siguiente. Nos vemos aqui.')
     agregar_a_playlist(youtube, id_serie, pl_serie)
     agregar_a_playlist(youtube, id_serie, pl_es)
     avanzar_dia_serie()
     send_telegram(f'✅ <b>Serie Dia {dia_serie}</b>\n{datos_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
 
-    # Subir video largo EN
-    id_en = subir_youtube(youtube, vid_largo_en, datos_en['titulo'],
-        datos_en['descripcion'], datos_en['tags'], thumb_en, idioma='en')
+    id_en = subir_youtube(youtube, v_l_en, datos_en['titulo'], datos_en['descripcion'], datos_en['tags'], thumb_en, idioma='en')
     agregar_comentario(youtube, id_en, datos_en.get('comentario_ancla', random.choice(COMENTARIOS_EN)))
     agregar_a_playlist(youtube, id_en, pl_en)
     send_telegram(f'✅ <b>Video EN</b>\n{datos_en["titulo"]}\nhttps://youtu.be/{id_en}')
 
-    # Subir short EN
-    id_short_en = subir_youtube(youtube, vid_short_en, datos_en['titulo_short'],
-        datos_en['descripcion'], datos_en['tags'], is_short=True, idioma='en')
-    agregar_comentario(youtube, id_short_en, random.choice(COMENTARIOS_EN))
-    agregar_a_playlist(youtube, id_short_en, pl_en)
-    send_telegram(f'✅ <b>Short EN</b>\nhttps://youtu.be/{id_short_en}')
+    id_s_en = subir_youtube(youtube, v_s_en, datos_en['titulo_short'], datos_en['descripcion'], datos_en['tags'], is_short=True, idioma='en')
+    agregar_comentario(youtube, id_s_en, random.choice(COMENTARIOS_EN))
+    agregar_a_playlist(youtube, id_s_en, pl_en)
+    send_telegram(f'✅ <b>Short EN</b>\nhttps://youtu.be/{id_s_en}')
 
-    # Community post
-    post = random.choice(COMMUNITY_POSTS_ES)
-    publicar_community_post(youtube, post)
-
-    # Reporte analytics (solo lunes)
+    publicar_community_post(youtube, random.choice(COMMUNITY_POSTS_ES))
     enviar_reporte_analytics(youtube)
 
-    send_telegram(f'🎉 <b>SaludMentalReal</b> — 5 videos publicados\nES: {tema_es}\nSerie dia {dia_serie}: {tema_serie}\nEN: {tema_en}')
+    send_telegram(f'🎉 <b>SaludMentalReal</b> — 5 videos publicados\nES: {tema_es}\nSerie dia {dia_serie}\nEN: {tema_en}')
 
 if __name__ == '__main__':
     main()
