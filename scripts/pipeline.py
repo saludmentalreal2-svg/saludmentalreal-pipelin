@@ -23,7 +23,7 @@ TEMAS_ES = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres',
     'como dormir mejor cuando la mente no para',
-    'señales de burnout y como recuperarte',
+    'seÃ±ales de burnout y como recuperarte',
     'como manejar un ataque de panico paso a paso',
     'la depresion no es tristeza lo que nadie explica',
     'como salir de una adiccion cuando no puedes',
@@ -34,7 +34,7 @@ TEMAS_ES = [
     'ansiedad social como superarla poco a poco',
     'autoestima baja de donde viene y como mejorarla',
     'como manejar el duelo cuando pierdes a alguien',
-    'señales de que necesitas ayuda psicologica',
+    'seÃ±ales de que necesitas ayuda psicologica',
     'mindfulness para principiantes en 5 minutos',
     'como dejar de procrastinar cuando la ansiedad paraliza',
     'el sindrome del impostor como combatirlo',
@@ -52,7 +52,7 @@ TEMAS_ES = [
     'como decirle no a personas toxicas',
     'por que te sientes vacio sin razon',
     'como dejar de buscar aprobacion de los demas',
-    'señales de inmadurez emocional',
+    'seÃ±ales de inmadurez emocional',
     'como sanar relaciones toxicas',
     'el miedo al rechazo y como vencerlo',
     'por que te saboteas inconscientemente',
@@ -62,7 +62,7 @@ TEMAS_ES = [
     'que es la ansiedad generalizada y como tratarla',
     'por que lloras sin razon',
     'como dejar de compararte en redes sociales',
-    'señales de trauma emocional sin saberlo',
+    'seÃ±ales de trauma emocional sin saberlo',
     'como manejar la soledad cuando vives solo',
     'por que sientes que no encajas en ningun lado',
     'como recuperar la motivacion cuando todo da igual',
@@ -70,7 +70,7 @@ TEMAS_ES = [
     'como dejar de ser tan duro contigo mismo',
     'por que te cuesta ser feliz aunque tengas todo',
     'como superar el miedo al fracaso',
-    'señales de que necesitas terapia urgente',
+    'seÃ±ales de que necesitas terapia urgente',
     'como manejar relacion con alguien deprimido',
     'por que la ansiedad aparece de noche',
     'como hablar de salud mental sin que te juzguen',
@@ -78,20 +78,20 @@ TEMAS_ES = [
     'como salir del ciclo de la negatividad',
     'por que tienes miedo al exito',
     'como construir autoestima desde cero',
-    'señales de que una relacion daña tu salud mental',
+    'seÃ±ales de que una relacion daÃ±a tu salud mental',
     'como manejar los celos sin destruir tu relacion',
     'por que te sientes culpable de ser feliz',
     'como superar la traicion de alguien que amabas',
     'el efecto del alcohol en tu salud mental',
     'como dejar de pensar demasiado overthinking',
     'por que evitas el conflicto aunque te lastime',
-    'señales de que eres altamente sensible',
+    'seÃ±ales de que eres altamente sensible',
     'como manejar la ansiedad en el trabajo',
     'por que te cuesta perdonar de verdad',
     'el impacto de la familia toxica en tu salud mental',
     'como sanar el miedo al abandono en adultos',
     'por que te autosaboteas en el amor',
-    'señales de codependencia emocional',
+    'seÃ±ales de codependencia emocional',
     'como meditar cuando tu mente no para',
     'por que el ejercicio ayuda mas que un antidepresivo',
     'como manejar la ansiedad social en eventos',
@@ -130,7 +130,7 @@ SERIE_30_DIAS = [
     'Dia 25: como reconstruirte despues de una crisis',
     'Dia 26: el rol del sueno en tu bienestar emocional',
     'Dia 27: como mantener limites saludables',
-    'Dia 28: aprende a celebrar tus pequeños avances',
+    'Dia 28: aprende a celebrar tus pequeÃ±os avances',
     'Dia 29: como prepararte para los dias dificiles',
     'Dia 30: has llegado lejos lo que sigue en tu camino'
 ]
@@ -195,11 +195,11 @@ COMENTARIOS_EN = [
 ]
 
 COMMUNITY_POSTS_ES = [
-    'Pregunta del dia: Cual es la cosa mas pequeña que puedes hacer HOY por tu salud mental?',
+    'Pregunta del dia: Cual es la cosa mas pequeÃ±a que puedes hacer HOY por tu salud mental?',
     'Del 1 al 10, como esta tu salud mental esta semana? Sin juicios, escribe tu numero abajo.',
     'Comparte una cosa que te ayuda cuando la ansiedad ataca. Puede salvar a alguien.',
     'Sabias que 1 de cada 4 personas sufre un trastorno mental? No estas solo.',
-    'Si pudieras darle un consejo a tu yo de hace 5 años sobre salud mental, cual seria?',
+    'Si pudieras darle un consejo a tu yo de hace 5 aÃ±os sobre salud mental, cual seria?',
 ]
 
 PALETAS = [
@@ -227,7 +227,7 @@ def get_tema_especial(tipo):
     return random.choice(opciones) if opciones else None
 
 def limpiar_texto_voz(texto):
-    texto = re.sub(r'[^\w\s\.,;:!?\-\(\)áéíóúñüÁÉÍÓÚÑÜa-zA-Z0-9]', ' ', texto)
+    texto = re.sub(r'[^\w\s\.,;:!?\-\(\)Ã¡Ã©Ã­Ã³ÃºÃ±Ã¼ÃÃ‰ÃÃ“ÃšÃ‘Ãœa-zA-Z0-9]', ' ', texto)
     texto = re.sub(r'\s+', ' ', texto)
     return texto.strip()
 
@@ -365,7 +365,7 @@ Tema: {tema}
 
 Escribe el JSON con estos campos exactos:
 
-titulo: titulo VIRAL en español. OBLIGATORIO: 2 emojis al inicio + pregunta dolorosa O numero O promesa concreta. Ejemplos: "😰 ¿Por que sientes ansiedad sin razon? Esto te pasa", "🧠 5 señales de que tu mente necesita ayuda YA", "💔 Deja de torturarte: 3 pasos para sanar HOY". Maximo 68 caracteres. Sin hashtags.
+titulo: titulo VIRAL en espaÃ±ol. OBLIGATORIO: 2 emojis al inicio + pregunta dolorosa O numero O promesa concreta. Ejemplos: "ðŸ˜° Â¿Por que sientes ansiedad sin razon? Esto te pasa", "ðŸ§  5 seÃ±ales de que tu mente necesita ayuda YA", "ðŸ’” Deja de torturarte: 3 pasos para sanar HOY". Maximo 68 caracteres. Sin hashtags.
 
 descripcion: 500 palabras. Primera linea pregunta que engancha. Segunda linea invita suscribirse. Parrafos con emojis. Capitulos: 0:00 Introduccion, 0:45 El problema real, 1:30 Por que te sucede, 2:45 3 soluciones, 4:00 Mensaje final. Recursos de crisis LATAM. 25 hashtags al final.
 
@@ -375,7 +375,7 @@ guion_short: Texto de 110 palabras MINIMO. SOLO TEXTO LIMPIO. Gancho en primeras
 
 titulo_short: titulo Short con 2 emojis max 48 caracteres sin hashtags.
 
-tags: lista de 25 tags SEO en español e ingles mezclados.
+tags: lista de 25 tags SEO en espaÃ±ol e ingles mezclados.
 
 comentario_ancla: comentario empatico 2 lineas sin emojis invitando a comentar.
 
@@ -388,7 +388,7 @@ Topic: {tema}
 
 Write JSON with these exact fields:
 
-titulo: VIRAL English title. REQUIRED: 2 emojis at start + painful question OR number OR concrete promise. Examples: "😰 Why Do You Feel Anxious for No Reason?", "🧠 5 Signs Your Mind Needs Help NOW". Max 68 chars. No hashtags.
+titulo: VIRAL English title. REQUIRED: 2 emojis at start + painful question OR number OR concrete promise. Examples: "ðŸ˜° Why Do You Feel Anxious for No Reason?", "ðŸ§  5 Signs Your Mind Needs Help NOW". Max 68 chars. No hashtags.
 
 descripcion: 400 words. Engaging question first. Subscribe line. Emoji paragraphs. Chapters: 0:00 Introduction, 0:45 The problem, 1:30 Why it happens, 2:45 Solutions, 4:00 Hope. Crisis helplines. 20 hashtags.
 
@@ -408,7 +408,7 @@ Respond ONLY with pure JSON no markdown.'''
         model='llama-3.3-70b-versatile',
         messages=[{'role':'user','content':prompt}],
         response_format={'type':'json_object'},
-        max_tokens=4000,
+        max_tokens=3000,
         temperature=0.85
     )
     datos = json.loads(resp.choices[0].message.content, strict=False)
@@ -519,7 +519,7 @@ def crear_thumbnail(titulo, archivo, paleta=None):
     except:
         font_big = ImageFont.load_default()
         font_med = font_big
-    titulo_limpio = re.sub(r'[^\w\s\?!.,áéíóúñüÁÉÍÓÚÑÜ]','',titulo).strip()
+    titulo_limpio = re.sub(r'[^\w\s\?!.,Ã¡Ã©Ã­Ã³ÃºÃ±Ã¼ÃÃ‰ÃÃ“ÃšÃ‘Ãœ]','',titulo).strip()
     palabras = titulo_limpio.upper().split()
     lineas, linea = [], ''
     for p in palabras:
@@ -683,12 +683,12 @@ def enviar_reporte_analytics(youtube):
         views = sum(int(r[1]) for r in rows)
         watch = sum(int(r[2]) for r in rows)
         subs = sum(int(r[3]) for r in rows)
-        send_telegram(f'📊 <b>Reporte Semanal</b>\n👁 Vistas: {views:,}\n⏱ Horas: {watch//60:,}h\n👥 Subs: +{subs:,}')
+        send_telegram(f'ðŸ“Š <b>Reporte Semanal</b>\nðŸ‘ Vistas: {views:,}\nâ± Horas: {watch//60:,}h\nðŸ‘¥ Subs: +{subs:,}')
     except Exception as e:
         print(f'Analytics error: {e}')
 
 def main():
-    send_telegram('🧠 <b>SaludMentalReal</b> — Iniciando produccion...')
+    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
     os.makedirs('/tmp/smr', exist_ok=True)
 
     print('Descargando videos Pexels...')
@@ -700,7 +700,7 @@ def main():
     musica = get_music_file()
     youtube = get_youtube()
 
-    pl_es = obtener_o_crear_playlist(youtube, PLAYLIST_ES_NAME, 'Videos psicologia bienestar emocional español', 'es')
+    pl_es = obtener_o_crear_playlist(youtube, PLAYLIST_ES_NAME, 'Videos psicologia bienestar emocional espaÃ±ol', 'es')
     pl_en = obtener_o_crear_playlist(youtube, PLAYLIST_EN_NAME, 'Psychology emotional wellness English', 'en')
     pl_serie = obtener_o_crear_playlist(youtube, SERIE_ES_NAME, 'Serie 30 dias salud mental', 'es')
 
@@ -763,14 +763,14 @@ def main():
         if id_es:
             agregar_comentario(youtube, id_es, datos_es.get('comentario_ancla', random.choice(COMENTARIOS_ES)))
             agregar_a_playlist(youtube, id_es, pl_es)
-            send_telegram(f'✅ <b>Video ES</b>\n{datos_es["titulo"]}\nhttps://youtu.be/{id_es}')
+            send_telegram(f'âœ… <b>Video ES</b>\n{datos_es["titulo"]}\nhttps://youtu.be/{id_es}')
 
     if ok_s_es:
         id_s_es = subir_youtube(youtube, v_s_es, datos_es['titulo_short'], datos_es['descripcion'], datos_es['tags'], is_short=True, idioma='es')
         if id_s_es:
             agregar_comentario(youtube, id_s_es, random.choice(COMENTARIOS_ES))
             agregar_a_playlist(youtube, id_s_es, pl_es)
-            send_telegram(f'✅ <b>Short ES</b>\nhttps://youtu.be/{id_s_es}')
+            send_telegram(f'âœ… <b>Short ES</b>\nhttps://youtu.be/{id_s_es}')
 
     if ok_serie:
         id_serie = subir_youtube(youtube, v_serie, datos_serie['titulo'], datos_serie['descripcion'], datos_serie['tags'], thumb_serie, idioma='es')
@@ -779,25 +779,25 @@ def main():
             agregar_a_playlist(youtube, id_serie, pl_serie)
             agregar_a_playlist(youtube, id_serie, pl_es)
             avanzar_dia_serie()
-            send_telegram(f'✅ <b>Serie Dia {dia_serie}</b>\n{datos_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
+            send_telegram(f'âœ… <b>Serie Dia {dia_serie}</b>\n{datos_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
 
     if ok_l_en:
         id_en = subir_youtube(youtube, v_l_en, datos_en['titulo'], datos_en['descripcion'], datos_en['tags'], thumb_en, idioma='en')
         if id_en:
             agregar_comentario(youtube, id_en, datos_en.get('comentario_ancla', random.choice(COMENTARIOS_EN)))
             agregar_a_playlist(youtube, id_en, pl_en)
-            send_telegram(f'✅ <b>Video EN</b>\n{datos_en["titulo"]}\nhttps://youtu.be/{id_en}')
+            send_telegram(f'âœ… <b>Video EN</b>\n{datos_en["titulo"]}\nhttps://youtu.be/{id_en}')
 
     if ok_s_en:
         id_s_en = subir_youtube(youtube, v_s_en, datos_en['titulo_short'], datos_en['descripcion'], datos_en['tags'], is_short=True, idioma='en')
         if id_s_en:
             agregar_comentario(youtube, id_s_en, random.choice(COMENTARIOS_EN))
             agregar_a_playlist(youtube, id_s_en, pl_en)
-            send_telegram(f'✅ <b>Short EN</b>\nhttps://youtu.be/{id_s_en}')
+            send_telegram(f'âœ… <b>Short EN</b>\nhttps://youtu.be/{id_s_en}')
 
     publicar_community_post(youtube, random.choice(COMMUNITY_POSTS_ES))
     enviar_reporte_analytics(youtube)
-    send_telegram(f'🎉 <b>SaludMentalReal</b> — Completado\nES: {tema_es}\nSerie dia {dia_serie}\nEN: {tema_en}')
+    send_telegram(f'ðŸŽ‰ <b>SaludMentalReal</b> â€” Completado\nES: {tema_es}\nSerie dia {dia_serie}\nEN: {tema_en}')
 
 if __name__ == '__main__':
     main()
