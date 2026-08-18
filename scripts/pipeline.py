@@ -22,7 +22,7 @@ TEMAS_ES = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres',
     'como dormir mejor cuando la mente no para',
-    'seÃ±ales de burnout y como recuperarte',
+    'seÃƒÆ’Ã‚Â±ales de burnout y como recuperarte',
     'como manejar un ataque de panico',
     'la depresion no es tristeza lo que nadie explica',
     'como salir de una adiccion',
@@ -33,7 +33,7 @@ TEMAS_ES = [
     'ansiedad social como superarla',
     'autoestima baja como mejorarla',
     'como manejar el duelo',
-    'seÃ±ales de que necesitas ayuda psicologica',
+    'seÃƒÆ’Ã‚Â±ales de que necesitas ayuda psicologica',
     'mindfulness para principiantes',
     'como dejar de procrastinar',
     'el sindrome del impostor',
@@ -53,7 +53,7 @@ TEMAS_ES = [
     'el miedo al rechazo',
     'por que te saboteas',
     'como superar el miedo al fracaso',
-    'seÃ±ales de codependencia emocional',
+    'seÃƒÆ’Ã‚Â±ales de codependencia emocional',
     'como meditar cuando tu mente no para',
     'como manejar la ansiedad en el trabajo',
     'el impacto de la familia toxica',
@@ -112,7 +112,7 @@ SERIE_30_DIAS = [
     'Dia 25: reconstruyete despues de una crisis',
     'Dia 26: el sueno y tu bienestar',
     'Dia 27: mantener limites saludables',
-    'Dia 28: celebra tus pequeÃ±os avances',
+    'Dia 28: celebra tus pequeÃƒÆ’Ã‚Â±os avances',
     'Dia 29: preparate para los dias dificiles',
     'Dia 30: has llegado lejos lo que sigue'
 ]
@@ -148,9 +148,9 @@ COMENTARIOS_EN = [
 
 COMMUNITY_POSTS = [
     'Del 1 al 10 como esta tu salud mental esta semana? Sin juicios.',
-    'Cual es la cosa mas pequeÃ±a que puedes hacer HOY por tu mente?',
+    'Cual es la cosa mas pequeÃƒÆ’Ã‚Â±a que puedes hacer HOY por tu mente?',
     'Comparte algo que te ayuda cuando la ansiedad ataca.',
-    'Si pudieras darle un consejo a tu yo de hace 5 aÃ±os, cual seria?',
+    'Si pudieras darle un consejo a tu yo de hace 5 aÃƒÆ’Ã‚Â±os, cual seria?',
     'Sabias que 1 de cada 4 personas sufre ansiedad? No estas solo.',
 ]
 
@@ -163,7 +163,7 @@ PALETAS = [
 ]
 
 def limpiar_texto(texto):
-    texto = re.sub(r'[^\w\s\.,;:!?\-Ã¡Ã©Ã­Ã³ÃºÃ±Ã¼ÃÃ‰ÃÃ“ÃšÃ‘Ãœa-zA-Z0-9]', ' ', texto)
+    texto = re.sub(r'[^\w\s\.,;:!?\-ÃƒÆ’Ã‚Â¡ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚Â±ÃƒÆ’Ã‚Â¼ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Â°ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Å“ÃƒÆ’Ã…Â¡ÃƒÆ’Ã¢â‚¬ËœÃƒÆ’Ã…â€œa-zA-Z0-9]', ' ', texto)
     return re.sub(r'\s+', ' ', texto).strip()
 
 def send_telegram(msg):
@@ -282,30 +282,36 @@ def extraer_json(texto):
 def generar_guion(tema, idioma='es'):
     client = Groq(api_key=GROQ_API_KEY)
     if idioma == 'es':
-        prompt = f'Eres psicologo latinoamericano para YouTube. Tema: {tema}\nResponde SOLO JSON valido:\n{{"titulo":"2 emojis + titulo viral max 65 chars","descripcion":"400 palabras emojis capitulos hashtags","guion":"550 palabras texto limpio sin emojis frases cortas","guion_short":"90 palabras texto limpio sin emojis","titulo_short":"2 emojis titulo max 45 chars","tags":["SaludMental","Ansiedad","Depresion","BienestarEmocional","PsicologiaLatina","MenteLibre","SaludMentalReal","Autoestima","Motivacion","Mindfulness","CrecimientoPersonal","TerapiaOnline","SaludMentalJovenes","AnsiedadSocial","VidaSaludable"],"comentario_ancla":"frase empatica 1 linea"}}'
+        prompt = 'Psicologo YouTube latinoamericano. Tema: ' + tema + '\nJSON valido:\n{"titulo":"2emojis+titulo viral max60chars","descripcion":"300 palabras con hashtags al final","guion":"400 palabras texto limpio sin emojis frases cortas","guion_short":"60 palabras texto limpio sin emojis","titulo_short":"2emojis+titulo max40chars","tags":["SaludMental","Ansiedad","Depresion","Mindfulness","PsicologiaLatina","Autoestima","MenteLibre","SaludMentalReal","Motivacion","BienestarEmocional"],"comentario_ancla":"frase empatica corta"}'
     else:
-        prompt = f'You are a psychologist for YouTube. Topic: {tema}\nRespond ONLY valid JSON:\n{{"titulo":"2 emojis + viral title max 65 chars","descripcion":"300 words emojis chapters hashtags","guion":"450 words clean text no emojis short sentences","guion_short":"70 words clean text no emojis","titulo_short":"2 emojis title max 45 chars","tags":["MentalHealth","Anxiety","Depression","EmotionalWellness","Psychology","MentalHealthMatters","SelfCare","Mindfulness","PersonalGrowth","Therapy","AnxietyRelief","HealingJourney"],"comentario_ancla":"empathetic phrase 1 line"}}'
-
+        prompt = 'YouTube psychologist. Topic: ' + tema + '\nJSON only:\n{"titulo":"2emojis+viral title max60chars","descripcion":"200 words hashtags at end","guion":"350 words clean text no emojis short sentences","guion_short":"50 words clean text no emojis","titulo_short":"2emojis+title max40chars","tags":["MentalHealth","Anxiety","Depression","Mindfulness","Psychology","SelfCare","Healing","Wellness","MentalHealthMatters","Therapy"],"comentario_ancla":"short empathetic phrase"}'
     for intento in range(3):
         try:
+            import time
+            if intento > 0: time.sleep(15)
             resp = client.chat.completions.create(
                 model='groq/compound',
                 messages=[{'role':'user','content':prompt}],
-                max_tokens=4096,
-                temperature=0.8,
-                
+                max_tokens=3000,
+                temperature=0.8
             )
             content = resp.choices[0].message.content or ''
-            datos = extraer_json(content)
-            if datos and 'titulo' in datos and 'guion' in datos:
-                palabras = len(datos.get('guion','').split())
-                print(f'Guion {idioma}: {palabras} palabras (intento {intento+1})')
-                return datos
+            content = re.sub(r'<thinking>[\s\S]*?</thinking>', '', content).strip()
+            start = content.find('{')
+            end = content.rfind('}')
+            if start != -1 and end != -1 and end > start:
+                try:
+                    datos = json.loads(content[start:end+1], strict=False)
+                    if datos and 'titulo' in datos and 'guion' in datos:
+                        palabras = len(datos.get('guion','').split())
+                        print(f'Guion {idioma}: {palabras} palabras (intento {intento+1})')
+                        return datos
+                except Exception as e:
+                    print(f'JSON parse error: {e}')
             print(f'JSON invalido intento {intento+1}')
         except Exception as e:
             print(f'Error Groq intento {intento+1}: {e}')
     raise ValueError(f'No se pudo generar guion para: {tema}')
-
 async def tts(texto, audio, srt, voz):
     import edge_tts
     rate = random.choice(['-8%','-10%','-12%'])
@@ -380,7 +386,7 @@ def crear_thumbnail(titulo, archivo):
         fb = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 82)
         fm = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 36)
     except: fb = ImageFont.load_default(); fm = fb
-    tl = re.sub(r'[^\w\s\?!.,Ã¡Ã©Ã­Ã³ÃºÃ±Ã¼ÃÃ‰ÃÃ“ÃšÃ‘Ãœ]','',titulo).strip().upper().split()
+    tl = re.sub(r'[^\w\s\?!.,ÃƒÆ’Ã‚Â¡ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚Â±ÃƒÆ’Ã‚Â¼ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Â°ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Å“ÃƒÆ’Ã…Â¡ÃƒÆ’Ã¢â‚¬ËœÃƒÆ’Ã…â€œ]','',titulo).strip().upper().split()
     lineas, linea = [], ''
     for pw in tl:
         test = (linea+' '+pw).strip()
@@ -488,11 +494,11 @@ def enviar_analytics(yt):
         hace7 = (datetime.now()-timedelta(days=7)).strftime('%Y-%m-%d')
         r = a.reports().query(ids='channel==MINE',startDate=hace7,endDate=hoy,metrics='views,estimatedMinutesWatched,subscribersGained',dimensions='day').execute()
         rows = r.get('rows',[])
-        send_telegram(f'ðŸ“Š <b>Reporte Semanal</b>\nðŸ‘ {sum(int(x[1]) for x in rows):,} vistas\nâ± {sum(int(x[2]) for x in rows)//60:,}h\nðŸ‘¥ +{sum(int(x[3]) for x in rows):,} subs')
+        send_telegram(f'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â  <b>Reporte Semanal</b>\nÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â {sum(int(x[1]) for x in rows):,} vistas\nÃƒÂ¢Ã‚ÂÃ‚Â± {sum(int(x[2]) for x in rows)//60:,}h\nÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â¥ +{sum(int(x[3]) for x in rows):,} subs')
     except: pass
 
 def main():
-    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
+    send_telegram('ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â  <b>SaludMentalReal</b> ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Iniciando produccion...')
     os.makedirs('/tmp/smr',exist_ok=True)
 
     vH = descargar_pexels(QUERIES_H,'landscape',5)
@@ -504,7 +510,7 @@ def main():
     musica = get_musica()
     yt = get_youtube()
 
-    pl_es = obtener_playlist(yt,PLAYLIST_ES,'Videos psicologia bienestar espaÃ±ol','es')
+    pl_es = obtener_playlist(yt,PLAYLIST_ES,'Videos psicologia bienestar espaÃƒÆ’Ã‚Â±ol','es')
     pl_en = obtener_playlist(yt,PLAYLIST_EN,'Psychology wellness English','en')
     pl_serie = obtener_playlist(yt,PLAYLIST_SERIE,'Serie 30 dias salud mental','es')
 
@@ -562,14 +568,14 @@ def main():
         if id_es:
             agregar_comentario(yt,id_es,d_es.get('comentario_ancla',random.choice(COMENTARIOS_ES)))
             agregar_playlist(yt,id_es,pl_es)
-            send_telegram(f'âœ… <b>Video ES</b>\n{d_es["titulo"]}\nhttps://youtu.be/{id_es}')
+            send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ <b>Video ES</b>\n{d_es["titulo"]}\nhttps://youtu.be/{id_es}')
 
     if ok_es_sh:
         id_es_sh=subir_video(yt,v_es_sh,d_es['titulo_short'],d_es['descripcion'],d_es['tags'],is_short=True,idioma='es')
         if id_es_sh:
             agregar_comentario(yt,id_es_sh,random.choice(COMENTARIOS_ES))
             agregar_playlist(yt,id_es_sh,pl_es)
-            send_telegram(f'âœ… <b>Short ES</b>\nhttps://youtu.be/{id_es_sh}')
+            send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ <b>Short ES</b>\nhttps://youtu.be/{id_es_sh}')
 
     if ok_serie:
         id_serie=subir_video(yt,v_serie,d_serie['titulo'],d_serie['descripcion'],d_serie['tags'],th_serie,idioma='es')
@@ -578,28 +584,28 @@ def main():
             agregar_playlist(yt,id_serie,pl_serie)
             agregar_playlist(yt,id_serie,pl_es)
             avanzar_serie()
-            send_telegram(f'âœ… <b>Serie Dia {dia}</b>\n{d_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
+            send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ <b>Serie Dia {dia}</b>\n{d_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
 
     if ok_en:
         id_en=subir_video(yt,v_en,d_en['titulo'],d_en['descripcion'],d_en['tags'],th_en,idioma='en')
         if id_en:
             agregar_comentario(yt,id_en,d_en.get('comentario_ancla',random.choice(COMENTARIOS_EN)))
             agregar_playlist(yt,id_en,pl_en)
-            send_telegram(f'âœ… <b>Video EN</b>\n{d_en["titulo"]}\nhttps://youtu.be/{id_en}')
+            send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ <b>Video EN</b>\n{d_en["titulo"]}\nhttps://youtu.be/{id_en}')
 
     if ok_en_sh:
         id_en_sh=subir_video(yt,v_en_sh,d_en['titulo_short'],d_en['descripcion'],d_en['tags'],is_short=True,idioma='en')
         if id_en_sh:
             agregar_comentario(yt,id_en_sh,random.choice(COMENTARIOS_EN))
             agregar_playlist(yt,id_en_sh,pl_en)
-            send_telegram(f'âœ… <b>Short EN</b>\nhttps://youtu.be/{id_en_sh}')
+            send_telegram(f'ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ <b>Short EN</b>\nhttps://youtu.be/{id_en_sh}')
 
     try:
         yt.communityPosts().insert(part='snippet',body={'snippet':{'type':'textPost','textOriginal':random.choice(COMMUNITY_POSTS)}}).execute()
     except: pass
 
     enviar_analytics(yt)
-    send_telegram(f'ðŸŽ‰ <b>SaludMentalReal</b> â€” Completado\nES: {tema_es}\nSerie dia {dia}\nEN: {tema_en}')
+    send_telegram(f'ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° <b>SaludMentalReal</b> ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Completado\nES: {tema_es}\nSerie dia {dia}\nEN: {tema_en}')
 
 if __name__=='__main__':
     main()
