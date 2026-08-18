@@ -22,7 +22,7 @@ TEMAS_ES = [
     'como controlar la ansiedad en momentos de crisis',
     'tecnicas de respiracion para calmar el estres',
     'como dormir mejor cuando la mente no para',
-    'seÃ±ales de burnout y como recuperarte',
+    'seÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ales de burnout y como recuperarte',
     'como manejar un ataque de panico',
     'la depresion no es tristeza lo que nadie explica',
     'como salir de una adiccion',
@@ -33,7 +33,7 @@ TEMAS_ES = [
     'ansiedad social como superarla',
     'autoestima baja como mejorarla',
     'como manejar el duelo',
-    'seÃ±ales de que necesitas ayuda psicologica',
+    'seÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ales de que necesitas ayuda psicologica',
     'mindfulness para principiantes',
     'como dejar de procrastinar',
     'el sindrome del impostor',
@@ -53,7 +53,7 @@ TEMAS_ES = [
     'el miedo al rechazo',
     'por que te saboteas',
     'como superar el miedo al fracaso',
-    'seÃ±ales de codependencia emocional',
+    'seÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ales de codependencia emocional',
     'como meditar cuando tu mente no para',
     'por que el ejercicio ayuda a la salud mental',
     'como manejar la ansiedad en el trabajo',
@@ -112,7 +112,7 @@ SERIE_30_DIAS = [
     'Dia 25: reconstruyete despues de una crisis',
     'Dia 26: el sueno y tu bienestar',
     'Dia 27: mantener limites saludables',
-    'Dia 28: celebra tus pequeÃ±os avances',
+    'Dia 28: celebra tus pequeÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±os avances',
     'Dia 29: preparate para los dias dificiles',
     'Dia 30: has llegado lejos lo que sigue'
 ]
@@ -148,9 +148,9 @@ COMENTARIOS_EN = [
 
 COMMUNITY_POSTS = [
     'Del 1 al 10 como esta tu salud mental esta semana? Sin juicios.',
-    'Cual es la cosa mas pequeÃ±a que puedes hacer HOY por tu mente?',
+    'Cual es la cosa mas pequeÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±a que puedes hacer HOY por tu mente?',
     'Comparte algo que te ayuda cuando la ansiedad ataca.',
-    'Si pudieras darle un consejo a tu yo de hace 5 aÃ±os, cual seria?',
+    'Si pudieras darle un consejo a tu yo de hace 5 aÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±os, cual seria?',
     'Sabias que 1 de cada 4 personas sufre ansiedad? No estas solo.',
 ]
 
@@ -163,7 +163,7 @@ PALETAS = [
 ]
 
 def limpiar_texto(texto):
-    texto = re.sub(r'[^\w\s\.,;:!?\-Ã¡Ã©Ã­Ã³ÃºÃ±Ã¼ÃÃ‰ÃÃ“ÃšÃ‘Ãœa-zA-Z0-9]', ' ', texto)
+    texto = re.sub(r'[^\w\s\.,;:!?\-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã†â€™Ãƒâ€¦Ã¢â‚¬Å“a-zA-Z0-9]', ' ', texto)
     return re.sub(r'\s+', ' ', texto).strip()
 
 def send_telegram(msg):
@@ -270,13 +270,15 @@ def generar_guion(tema, idioma='es'):
         prompt = f'You are a psychologist for YouTube. Create content about: {tema}\n\nRespond ONLY JSON no extra text:\n{{"titulo":"2 emojis start + viral title max 65 chars no hashtags","descripcion":"300 words with emojis chapters 0:00 1:00 2:30 4:00 and 15 hashtags at end","guion":"450 words clean text no emojis no special symbols short sentences","guion_short":"70 words clean text no emojis","titulo_short":"2 emojis + short title max 45 chars","tags":["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10","tag11","tag12"],"comentario_ancla":"empathetic phrase 1 line no emojis"}}'
     
     resp = client.chat.completions.create(
-        model='openai/gpt-oss-120b',
+        model='openai/gpt-oss-20b',
         messages=[{'role':'user','content':prompt}],
         max_tokens=2000,
-        temperature=0.8
+        temperature=0.8,
+        extra_body={'include_reasoning': False}
     )
     content = resp.choices[0].message.content or ''
-    match = re.search(r'\{[\s\S]*\}', content)
+    content = re.sub(r'<thinking>[\s\S]*?</thinking>', '', content).strip()
+    match = re.search(r'\\{[\s\S]*\}', content)
     if not match:
         print(f'Respuesta completa: {content[:500]}')
         raise ValueError(f'No JSON encontrado')
@@ -354,7 +356,7 @@ def thumbnail(titulo, archivo):
         fb = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 82)
         fm = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 36)
     except: fb = ImageFont.load_default(); fm = fb
-    tl = re.sub(r'[^\w\s\?!.,Ã¡Ã©Ã­Ã³ÃºÃ±Ã¼ÃÃ‰ÃÃ“ÃšÃ‘Ãœ]','',titulo).strip().upper().split()
+    tl = re.sub(r'[^\w\s\?!.,ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã†â€™Ãƒâ€¦Ã¢â‚¬Å“]','',titulo).strip().upper().split()
     lineas, linea = [], ''
     for p2 in tl:
         test = (linea+' '+p2).strip()
@@ -453,11 +455,11 @@ def analytics(yt):
         hace7=(datetime.now()-timedelta(days=7)).strftime('%Y-%m-%d')
         r=a.reports().query(ids='channel==MINE',startDate=hace7,endDate=hoy,metrics='views,estimatedMinutesWatched,subscribersGained',dimensions='day').execute()
         rows=r.get('rows',[])
-        send_telegram(f'ðŸ“Š <b>Reporte Semanal</b>\nðŸ‘ {sum(int(x[1]) for x in rows):,} vistas\nâ± {sum(int(x[2]) for x in rows)//60:,}h\nðŸ‘¥ +{sum(int(x[3]) for x in rows):,} subs')
+        send_telegram(f'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã‚Â  <b>Reporte Semanal</b>\nÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“Ãƒâ€šÃ‚Â {sum(int(x[1]) for x in rows):,} vistas\nÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â± {sum(int(x[2]) for x in rows)//60:,}h\nÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“Ãƒâ€šÃ‚Â¥ +{sum(int(x[3]) for x in rows):,} subs')
     except: pass
 
 def main():
-    send_telegram('ðŸ§  <b>SaludMentalReal</b> â€” Iniciando produccion...')
+    send_telegram('ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Â  <b>SaludMentalReal</b> ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Iniciando produccion...')
     os.makedirs('/tmp/smr',exist_ok=True)
 
     vH=descargar_pexels(QUERIES_H,'landscape',5)
@@ -466,7 +468,7 @@ def main():
 
     musica=get_musica()
     yt=get_youtube()
-    pl_es=obtener_playlist(yt,PLAYLIST_ES,'Videos psicologia bienestar espaÃ±ol','es')
+    pl_es=obtener_playlist(yt,PLAYLIST_ES,'Videos psicologia bienestar espaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±ol','es')
     pl_en=obtener_playlist(yt,PLAYLIST_EN,'Psychology wellness English','en')
     pl_serie=obtener_playlist(yt,PLAYLIST_SERIE,'Serie 30 dias salud mental','es')
 
@@ -522,14 +524,14 @@ def main():
         if id_es:
             comentario(yt,id_es,d_es.get('comentario_ancla',random.choice(COMENTARIOS_ES)))
             agregar_playlist(yt,id_es,pl_es)
-            send_telegram(f'âœ… <b>Video ES</b>\n{d_es["titulo"]}\nhttps://youtu.be/{id_es}')
+            send_telegram(f'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ <b>Video ES</b>\n{d_es["titulo"]}\nhttps://youtu.be/{id_es}')
 
     if ok_es_sh:
         id_es_sh=subir(yt,v_es_sh,d_es['titulo_short'],d_es['descripcion'],d_es['tags'],is_short=True,idioma='es')
         if id_es_sh:
             comentario(yt,id_es_sh,random.choice(COMENTARIOS_ES))
             agregar_playlist(yt,id_es_sh,pl_es)
-            send_telegram(f'âœ… <b>Short ES</b>\nhttps://youtu.be/{id_es_sh}')
+            send_telegram(f'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ <b>Short ES</b>\nhttps://youtu.be/{id_es_sh}')
 
     if ok_serie:
         id_serie=subir(yt,v_serie,d_serie['titulo'],d_serie['descripcion'],d_serie['tags'],th_serie,idioma='es')
@@ -538,28 +540,28 @@ def main():
             agregar_playlist(yt,id_serie,pl_serie)
             agregar_playlist(yt,id_serie,pl_es)
             avanzar_serie()
-            send_telegram(f'âœ… <b>Serie Dia {dia}</b>\n{d_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
+            send_telegram(f'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ <b>Serie Dia {dia}</b>\n{d_serie["titulo"]}\nhttps://youtu.be/{id_serie}')
 
     if ok_en:
         id_en=subir(yt,v_en,d_en['titulo'],d_en['descripcion'],d_en['tags'],th_en,idioma='en')
         if id_en:
             comentario(yt,id_en,d_en.get('comentario_ancla',random.choice(COMENTARIOS_EN)))
             agregar_playlist(yt,id_en,pl_en)
-            send_telegram(f'âœ… <b>Video EN</b>\n{d_en["titulo"]}\nhttps://youtu.be/{id_en}')
+            send_telegram(f'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ <b>Video EN</b>\n{d_en["titulo"]}\nhttps://youtu.be/{id_en}')
 
     if ok_en_sh:
         id_en_sh=subir(yt,v_en_sh,d_en['titulo_short'],d_en['descripcion'],d_en['tags'],is_short=True,idioma='en')
         if id_en_sh:
             comentario(yt,id_en_sh,random.choice(COMENTARIOS_EN))
             agregar_playlist(yt,id_en_sh,pl_en)
-            send_telegram(f'âœ… <b>Short EN</b>\nhttps://youtu.be/{id_en_sh}')
+            send_telegram(f'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ <b>Short EN</b>\nhttps://youtu.be/{id_en_sh}')
 
     try:
         yt.communityPosts().insert(part='snippet',body={'snippet':{'type':'textPost','textOriginal':random.choice(COMMUNITY_POSTS)}}).execute()
     except: pass
 
     analytics(yt)
-    send_telegram(f'ðŸŽ‰ <b>SaludMentalReal</b> â€” Completado\nES: {tema_es}\nSerie dia {dia}\nEN: {tema_en}')
+    send_telegram(f'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â° <b>SaludMentalReal</b> ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Completado\nES: {tema_es}\nSerie dia {dia}\nEN: {tema_en}')
 
 if __name__=='__main__':
     main()
