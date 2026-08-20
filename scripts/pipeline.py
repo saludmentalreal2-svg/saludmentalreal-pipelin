@@ -168,8 +168,10 @@ def limpiar_texto(texto):
 
 def send_telegram(msg):
     try:
+        # Limpiar caracteres que corrompen encoding
+        msg_limpio = msg.encode('utf-8', 'ignore').decode('utf-8')
         requests.post(f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage',
-            json={'chat_id': TELEGRAM_CHAT_ID, 'text': msg, 'parse_mode': 'HTML'}, timeout=10)
+            json={'chat_id': TELEGRAM_CHAT_ID, 'text': msg_limpio, 'parse_mode': 'HTML'}, timeout=10)
     except: pass
 
 def run_ffmpeg(cmd, label=''):
