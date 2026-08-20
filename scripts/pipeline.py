@@ -306,6 +306,12 @@ def generar_guion(tema, idioma='es'):
                 try:
                     datos = json.loads(content[start:end+1], strict=False)
                     guion = datos.get('guion', '')
+                    # Agregar defaults para campos opcionales
+                    if 'guion_short' not in datos: datos['guion_short'] = guion[:200]
+                    if 'titulo_short' not in datos: datos['titulo_short'] = datos.get('titulo','')[:45]
+                    if 'tags' not in datos: datos['tags'] = ['SaludMental','Ansiedad','Depresion','Mindfulness','Bienestar']
+                    if 'comentario_ancla' not in datos: datos['comentario_ancla'] = 'Cuentame como te sientes hoy.'
+                    if 'descripcion' not in datos: datos['descripcion'] = guion[:300]
                     if datos and 'titulo' in datos and guion and len(guion.split()) > 30:
                         print(f'Guion {idioma}: {len(guion.split())} palabras OK')
                         return datos
