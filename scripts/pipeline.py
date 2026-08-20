@@ -305,10 +305,13 @@ def generar_guion(tema, idioma='es'):
             if start != -1 and end != -1 and end > start:
                 try:
                     datos = json.loads(content[start:end+1], strict=False)
-                    if datos and 'titulo' in datos and 'guion' in datos and len(datos.get('guion','').split()) > 50:
-                        print(f'Guion {idioma}: {len(datos[chr(34)+chr(103)+chr(117)+chr(105)+chr(111)+chr(110)+chr(34)].split())} palabras OK')
+                    guion = datos.get('guion', '')
+                    if datos and 'titulo' in datos and guion and len(guion.split()) > 30:
+                        print(f'Guion {idioma}: {len(guion.split())} palabras OK')
                         return datos
-                except: pass
+                    print(f'JSON incompleto: titulo={bool(datos.get("titulo"))} guion_palabras={len(guion.split())}')
+                except Exception as je:
+                    print(f'JSON parse error: {je}')
             print(f'Reintentando {intento+1}/3 - respuesta: {content[:100]}')
         except Exception as e:
             print(f'Error Groq {intento+1}: {e}')
