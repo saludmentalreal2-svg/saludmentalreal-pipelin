@@ -304,7 +304,11 @@ def generar_guion(tema, idioma='es'):
             end = content.rfind('}')
             if start != -1 and end != -1 and end > start:
                 try:
-                    datos = json.loads(content[start:end+1], strict=False)
+                    json_str = content[start:end+1]
+                    # Limpiar escapes invalidos
+                    import re as _re
+                    json_str = _re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', json_str)
+                    datos = json.loads(json_str, strict=False)
                     guion = datos.get('guion', '')
                     # Agregar defaults para campos opcionales
                     if 'guion_short' not in datos: datos['guion_short'] = guion[:200]
