@@ -290,7 +290,7 @@ def generar_guion(tema, idioma='es'):
             import time
             if intento > 0: time.sleep(20)
             resp = client.chat.completions.create(
-                model='groq/compound-mini',
+                model='allam-2-7b',
                 messages=[{'role':'system','content':instruccion},{'role':'user','content':f'Tema: {tema}'}],
                 max_tokens=2000,
                 temperature=0.8
