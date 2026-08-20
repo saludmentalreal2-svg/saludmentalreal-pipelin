@@ -290,13 +290,16 @@ def generar_guion(tema, idioma='es'):
             import time
             if intento > 0: time.sleep(20)
             resp = client.chat.completions.create(
-                model='qwen/qwen3.6-27b',
+                model='allam-2-7b',
                 messages=[{'role':'system','content':instruccion},{'role':'user','content':f'Tema: {tema}'}],
                 max_tokens=2000,
                 temperature=0.8
             )
             content = resp.choices[0].message.content or ''
-            content = re.sub(r'<think[^>]*>[\s\S]*?</think(?:ing)?>', '', content).strip()
+            if '<think' in content:
+                idx = content.rfind('>')
+                if idx != -1:
+                    content = content[idx+1:].strip()
             start = content.find('{')
             end = content.rfind('}')
             if start != -1 and end != -1 and end > start:
