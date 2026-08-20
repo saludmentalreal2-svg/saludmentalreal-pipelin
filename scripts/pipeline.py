@@ -311,7 +311,7 @@ def generar_guion(tema, idioma='es'):
                     datos = json.loads(json_str, strict=False)
                     guion = datos.get('guion', '')
                     # Agregar defaults para campos opcionales
-                    if 'guion_short' not in datos: datos['guion_short'] = guion[:200]
+                    if 'guion_short' not in datos: datos['guion_short'] = ' '.join(guion.split()[:120])
                     if 'titulo_short' not in datos: datos['titulo_short'] = datos.get('titulo','')[:45]
                     if 'tags' not in datos: datos['tags'] = ['SaludMental','Ansiedad','Depresion','Mindfulness','Bienestar']
                     if 'comentario_ancla' not in datos: datos['comentario_ancla'] = 'Cuentame como te sientes hoy.'
@@ -375,8 +375,14 @@ def mezclar(voz, musica, salida, vol=0.08):
         print(f'Audio muy corto ({dur:.1f}s) - usando solo voz')
         shutil.copy(voz, salida)
         return
-    ok = run_ffmpeg(['ffmpeg','-y','-i',voz,'-i',musica,
-        '-filter_complex',f'[0:a]aformat=sample_rates=44100:channel_layouts=stereo[a1];[1:a]volume={vol},aformat=sample_rates=44100:channel_layouts=stereo,aloop=loop=-1:size=2e+09[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=3[out]',
+    # Convertir voz a WAV primero para compatibilidad
+    voz_wav = voz + '.wav'
+    run_ffmpeg(['ffmpeg','-y','-i',voz,'-ar','44100','-ac','2','-f','wav',voz_wav], 'voz2wav')
+    if not os.path.exists(voz_wav) or os.path.getsize(voz_wav) < 1000:
+        shutil.copy(voz, salida)
+        return
+    ok = run_ffmpeg(['ffmpeg','-y','-i',voz_wav,'-i',musica,
+        '-filter_complex',f'[0:a]volume=1.0[a1];[1:a]volume={vol},aloop=loop=-1:size=2e+09[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=3[out]',
         '-map','[out]','-c:a','aac','-b:a','128k','-ar','44100',salida], 'mezcla')
     if not ok or not os.path.exists(salida) or os.path.getsize(salida)<1000:
         shutil.copy(voz, salida)
@@ -448,7 +454,7 @@ def agregar_subtitulos(vi, srt, vo, fs=18, mv=40):
 
 def crear_video(audio, srt, videos, output, w=1280, h=720, is_short=False):
     dur = duracion_audio(audio)
-    if dur < 20:
+    if dur < 15:
         print(f'Audio muy corto {dur:.1f}s - saltando')
         return False
     dur_clip = 12
